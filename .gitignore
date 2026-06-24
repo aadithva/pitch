@@ -4,3 +4,4 @@ tmp/
 *.log
 build/
 .deck-theme/
+deck-to-video/.venv/

@@ -1,20 +1,31 @@
-# Video Pipeline (Phase 3–4 design)
+# Video Pipeline
 
-How the narrated, word-highlighted video will be built on top of the Phase 1 deck.
-This is the implementation spec; scripts land in Phases 3–4. (Sourcing:
-`research/02`, `research/03`; `plan/01-architecture.md`.)
+How the narrated, word-highlighted video is built on top of the Phase 1 deck.
+**Phases 2–3 are implemented**; Phase 4 (highlighting the slide text itself) is
+designed below. (Sourcing: `research/02`, `research/03`; `plan/01-architecture.md`.)
 
-## Overview
+## Implemented flow (Phase 3)
 ```
-slides.json (+narration) ──► tts.py ──► sN.mp3 + sN.words.json
-deck.html (data-w spans) ──► merge timings ──► record_video.mjs ──► recording.webm
-recording.webm + audio   ──► assemble.py (ffmpeg) ──► final.mp4
+slides.json (+narration) ──► tts.py        ──► audio/sNNN.mp3 + sNNN.words.json + index.json
+deck.html + audio/index  ──► render_video.mjs ──► frames (Playwright) + voiceover (ffmpeg) ──► final.mp4
+```
+The captions are rendered **in the browser** (the deck's own theme, `--highlight`
+color) and captured deterministically frame-by-frame, then muxed with the
+narration via ffmpeg. **No libass / `ass` filter is required** — any ffmpeg works.
+
+### Commands
+```bash
+python3 scripts/tts.py slides.json --out build/<name> [--voice en-US-AriaNeural]
+node scripts/render_video.mjs build/<name>/deck.html build/<name> \
+  --out build/<name>/final.mp4 [--fps 12] [--pad 0.4]
 ```
 
 ## Stage 3 — TTS + word timestamps (`scripts/tts.py`)
-Pluggable provider, same output contract `{ mp3, words:[{word,start,end}] }`:
-- **edge-tts** (default, free): `edge-tts --text … --write-media s.mp3
-  --write-subtitles s.srt` — SRT already has word timing. No alignment needed.
+Pluggable provider; output contract per slide: `sNNN.mp3` + `sNNN.words.json`
+(`[{text,start,end}]` seconds) + `audio/index.json` (durations).
+- **edge-tts** (default, free, implemented): uses the streaming API with
+  `boundary="WordBoundary"` to get exact per-word offsets natively — no separate
+  alignment step. Duration is read back with `ffprobe`.
 - **Kokoro ONNX** (local, Apache): synthesize, then `faster-whisper
   word_timestamps=True` for timings.
 - **ElevenLabs** (premium): `POST /v1/text-to-speech/{voice}/with-timestamps` →
@@ -23,7 +34,19 @@ Pluggable provider, same output contract `{ mp3, words:[{word,start,end}] }`:
 
 Priority for timestamps: TTS-native (edge-tts/ElevenLabs) → faster-whisper → WhisperX.
 
-## Stage 4 — In-slide karaoke (the differentiator)
+## Stage 3 render — karaoke captions (`scripts/render_video.mjs`, implemented)
+1. Build a global timeline from `audio/index.json` + each `words.json`, folding a
+   `--pad` gap between slides so the caption clock matches the assembled audio.
+2. Inject a caption overlay + `__dvSeek(t)` driver into a temp `deck.__video.html`.
+3. Playwright opens it, disables transitions, and for each frame `t = f/fps` calls
+   `__dvSeek(t)` (navigates to the active slide, highlights the active word) and
+   screenshots. Waits for Mermaid SVGs when a diagram slide appears.
+4. ffmpeg concatenates per-slide audio (mp3 + silence pad / `anullsrc` for silent
+   slides) into `voiceover.wav`, then muxes `frames + voiceover → final.mp4`.
+   Deterministic and reproducible; transitions are disabled so every frame shows a
+   clean highlight state.
+
+## Stage 4 — In-slide karaoke (next; the differentiator)
 1. **Match** narration words → on-slide `<span data-w>` (order + fuzzy text match
    using `deck.words.json`). Emit a per-slide timeline.
 2. Inject the timeline into `deck.html` as `window.__NARRATION__` (the template

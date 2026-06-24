@@ -25,7 +25,7 @@ const IGNORE_DIRS = new Set([
   'node_modules', '.git', 'dist', 'build', 'out', '.next', '.nuxt',
   'coverage', 'vendor', '.cache', 'tmp', '.venv', '__pycache__'
 ]);
-const TEXT_EXT = new Set(['.css', '.scss', '.sass', '.less', '.json', '.js', '.ts', '.cjs', '.mjs', '.html', '.vue', '.svelte']);
+const TEXT_EXT = new Set(['.css', '.scss', '.sass', '.less', '.json', '.js', '.jsx', '.ts', '.tsx', '.cjs', '.mjs', '.html', '.vue', '.svelte', '.astro', '.mdx']);
 
 function log(msg) {
   process.stderr.write(`extract_style: ${msg}\n`);
@@ -310,12 +310,12 @@ async function main() {
     }
     const b = basename(f).toLowerCase();
 
-    if (ext === '.css' || ext === '.scss' || ext === '.sass' || ext === '.less' || ext === '.vue' || ext === '.svelte' || ext === '.html') {
+    if (ext === '.css' || ext === '.scss' || ext === '.sass' || ext === '.less' || ext === '.vue' || ext === '.svelte' || ext === '.astro' || ext === '.html' || ext === '.mdx') {
       Object.assign(named, extractCssVars(text));
       allText.push(text);
     }
     if (b.startsWith('tailwind.config')) Object.assign(named, extractTailwindColors(text));
-    if (ext === '.js' || ext === '.ts' || ext === '.mjs' || ext === '.cjs' || ext === '.html' || ext === '.vue') {
+    if (ext === '.js' || ext === '.jsx' || ext === '.ts' || ext === '.tsx' || ext === '.mjs' || ext === '.cjs' || ext === '.html' || ext === '.vue' || ext === '.astro' || ext === '.mdx') {
       allText.push(text);
     }
     if (ext === '.json') {

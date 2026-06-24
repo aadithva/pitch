@@ -22,12 +22,12 @@ want a polished explainer without a timeline editor.
 - `deck.html` — a single self-contained reveal.js deck, styled in the project's brand.
 - `deck.pdf` — a shareable PDF (+ optional per-slide PNG frames).
 - `theme.json` / `theme.css` — the extracted visual style (reusable).
-- *(Phase 3+)* `narration/` — per-slide script + audio + word timings.
-- *(Phase 3+)* `final.mp4` — the narrated, word-highlighted video.
+- `narration/audio/` — per-slide narration audio + word timings (`tts.py`).
+- `final.mp4` — the narrated video with karaoke word-highlighting captions.
 
-> **Status:** Phase 1 (deck generation) + style extraction are implemented.
-> Narration and video are specified in `references/` and the project plan; see
-> "Roadmap" below.
+> **Status:** Phases 1–3 implemented — style extraction, brand-styled deck
+> (HTML/PDF), AI voiceover, and a narrated MP4 with synced word-highlighting
+> captions. Phase 4 (highlighting on the slide text itself) is next; see "Roadmap".
 
 ## Quick reference
 
@@ -38,8 +38,10 @@ want a polished explainer without a timeline editor.
 | Plan the slides | Write `slides.json` per the blueprint + `schemas/slides.schema.json` | `references/deck-blueprint.md` |
 | Render the deck | `node scripts/render_deck.mjs <slides.json> <theme.json> --out deck.html` | this file |
 | Export PDF / frames | `node scripts/export_pdf.mjs deck.html --out deck.pdf --png frames/` | this file |
+| Validate deck output | `node scripts/validate_deck.mjs deck.html` | this file |
 | Write narration | Add `narration` to each slide (rules) | `references/narration-rules.md` |
-| Make the video | *(Phase 3+)* TTS + capture + ffmpeg | `references/video-pipeline.md` |
+| Synthesize voiceover | `python3 scripts/tts.py <slides.json> --out <dir>` | `references/video-pipeline.md` |
+| Render the video | `node scripts/render_video.mjs <deck.html> <dir> --out final.mp4` | `references/video-pipeline.md` |
 
 ## Workflow (5 stages)
 
@@ -55,10 +57,11 @@ node scripts/extract_style.mjs <projectDir> --out build/<name>
 ```
 Scans design tokens (DTCG `tokens.json`, CSS `:root` vars, Tailwind config), the
 logo (palette via node-vibrant), and fonts (`@font-face`, Google Fonts,
-`@fontsource`). Writes `theme.json` + `theme.css`. Keeps a professional **dark**
-base and adopts the brand's primary/secondary/accent + fonts (and a dark brand
-background if present). Use `--mode light` for a light deck. See
-`references/theming.md`.
+`@fontsource`). It also covers common modern source files like `.tsx` and `.jsx`
+so frontends built with React/Vite/Next.js are picked up cleanly. Writes
+`theme.json` + `theme.css`. Keeps a professional **dark** base and adopts the
+brand's primary/secondary/accent + fonts (and a dark brand background if
+present). Use `--mode light` for a light deck. See `references/theming.md`.
 
 ### 3. Generate the deck
 Turn `project_brief.json` into a `slides.json` (array of typed slides) following
@@ -77,17 +80,30 @@ node scripts/export_pdf.mjs build/<name>/deck.html --out build/<name>/deck.pdf -
 Produces a PDF and (optionally) one PNG per slide. Always **review the frames
 visually** before declaring done (see QA).
 
-### 5. Narrate + render video *(Phase 3+)*
-Write per-slide `narration` (see `references/narration-rules.md`), synthesize
-audio + word timings (TTS), then capture the deck with synced highlights and mux
-with ffmpeg. Full design in `references/video-pipeline.md`.
+### 5. Narrate + render the video
+Each slide's `narration` (see `references/narration-rules.md`) drives the
+voiceover. Synthesize audio + word timings, then render a narrated MP4 with
+karaoke captions (the spoken word highlights in sync):
+```bash
+# a) TTS: narration -> per-slide mp3 + word timings (+ audio/index.json)
+python3 scripts/tts.py path/to/slides.json --out build/<name> [--voice en-US-AriaNeural]
+
+# b) Video: deck + audio -> final.mp4 (browser-rendered captions, captured
+#    deterministically frame-by-frame, muxed with ffmpeg — no libass needed)
+node scripts/render_video.mjs build/<name>/deck.html build/<name> \
+  --out build/<name>/final.mp4 [--fps 12] [--pad 0.4]
+```
+The captions render in the browser using the deck's theme (`--highlight` color),
+so the video is on-brand and reproducible. Full design + options:
+`references/video-pipeline.md`.
 
 ## QA (do this before finishing)
 1. Run `export_pdf.mjs ... --png frames/` and **open several frames** (cover, a
    cards slide, any diagram, the closing). Confirm: no clipped text, brand colors
    applied, fonts loaded, diagrams rendered.
-2. Check `deck.words.json`: `words` count should equal the number of `data-w`
-   spans in `deck.html` (they must stay in sync for karaoke).
+2. Run `node scripts/validate_deck.mjs deck.html` to confirm the deck has the
+   expected slide count, no unresolved placeholders, and a `deck.words.json`
+   manifest that matches the `data-w` span count.
 3. If a diagram is blank, it's usually a Mermaid timing issue — re-export (capture
    waits for the SVG to size). Mermaid needs network (CDN); image visuals are
    fully offline.
@@ -96,18 +112,24 @@ with ffmpeg. Full design in `references/video-pipeline.md`.
 Install inside the skill folder:
 ```bash
 npm install                      # reveal.js, node-vibrant, playwright
-npx playwright install chromium  # for PDF/PNG export (and later video)
+npx playwright install chromium  # for PDF/PNG export and video capture
+
+# TTS (voiceover) — use a venv (PEP 668-safe):
+python3 -m venv .venv
+./.venv/bin/pip install edge-tts                 # free, emits word timings
+# then run: ./.venv/bin/python scripts/tts.py ...
 ```
-- **Node** ≥ 20 (developed on 25). **ffmpeg** (Phase 3+ video).
-- TTS (Phase 3): `pip install edge-tts faster-whisper` (free path), or set
-  `ELEVENLABS_API_KEY` for premium. Optional local: Kokoro ONNX.
+- **Node** ≥ 20 (developed on 25). **ffmpeg** (any build — **libass not required**;
+  captions render in-browser, not via the `ass` filter).
+- **TTS:** `edge-tts` (default, free, online). Optional: ElevenLabs
+  (`ELEVENLABS_API_KEY`) or local Kokoro + `faster-whisper`.
 
 ## Roadmap
 - ✅ **Phase 1** — style extraction + brand-styled deck (HTML/PDF/PNG).
-- ⬜ **Phase 2** — narration scripts on each slide (+ speaker notes export).
-- ⬜ **Phase 3** — TTS voiceover + simple caption-bar karaoke MP4.
-- ⬜ **Phase 4** — in-slide word highlighting (the differentiator).
-- ⬜ **Phase 5** — motion polish, multi-voice, `.pptx` export.
+- ✅ **Phase 2** — per-slide narration scripts (exported as reveal.js speaker notes).
+- ✅ **Phase 3** — AI voiceover (`edge-tts`) + narrated MP4 with karaoke captions.
+- ⬜ **Phase 4** — highlight the words on the slide text itself (not just captions).
+- ⬜ **Phase 5** — motion polish, multi-voice/provider, `.pptx` export.
 
 See the repository `plan/` directory for the full research-backed plan.
 
@@ -115,7 +137,7 @@ See the repository `plan/` directory for the full research-backed plan.
 ```
 SKILL.md                 # this router
 references/              # deep-dive guidance (read when relevant)
-scripts/                 # extract_style, render_deck, export_pdf (+ lib/)
+scripts/                 # extract_style, render_deck, export_pdf, tts, render_video, validate_deck (+ lib/)
 assets/                  # deck_template.html, base.css, highlight.css, default_theme.json
 schemas/                 # project_brief + slides JSON contracts
 examples/                # demo-project (slides.json) + sample-brand (style extraction)
