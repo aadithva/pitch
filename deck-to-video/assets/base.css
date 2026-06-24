@@ -152,17 +152,18 @@
 .layout-diagram .diagram .mermaid svg { max-width: 100%; max-height: 54vh; height: auto; }
 
 /* --- Layout: showcase (UI is the hero — small text left, enlarged screenshot right) --- */
+.reveal .slides section.layout-showcase { padding: 5.5% 6%; }
 .layout-showcase .sc-split {
-  display: grid; grid-template-columns: 34% 1fr; gap: 5%;
+  display: grid; grid-template-columns: 29% 1fr; gap: 4%;
   align-items: center; width: 100%;
 }
-.layout-showcase .sc-text h2 { font-size: 1.3em; }
-.layout-showcase .sc-text .body { font-size: 0.78em; color: var(--muted); margin-top: 0.6em; max-width: 100%; }
+.layout-showcase .sc-text h2 { font-size: 1.25em; }
+.layout-showcase .sc-text .body { font-size: 0.76em; color: var(--muted); margin-top: 0.6em; max-width: 100%; }
 .layout-showcase .sc-shot {
   display: flex; align-items: center; justify-content: center; min-width: 0;
 }
 .layout-showcase .sc-shot img {
-  width: 100%; max-height: 82vh; object-fit: contain;
+  width: 100%; max-height: 90vh; object-fit: contain;
   border-radius: 14px;
   box-shadow: 0 30px 90px rgba(0,0,0,0.55);
   border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
