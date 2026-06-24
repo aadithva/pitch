@@ -15,6 +15,7 @@ import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { chromium } from 'playwright';
+import { matchInslide } from './lib/align.mjs';
 
 function fail(msg) {
   process.stderr.write(`render_video: ${msg}\n`);
@@ -31,7 +32,7 @@ function run(cmd, args) {
   });
 }
 
-// --- the in-page caption + seek driver (injected into the deck) -------------
+// --- the in-page caption + in-slide highlight + seek driver -----------------
 const DRIVER = `
 <style>
   #dv-caption{position:fixed;left:7%;right:7%;bottom:5%;margin:0 auto;max-width:86%;
@@ -41,9 +42,12 @@ const DRIVER = `
   #dv-caption .cw{padding:0 .14em;border-radius:6px;color:#cbd5e1;}
   #dv-caption .cw.done{color:var(--text);}
   #dv-caption .cw.active{background:var(--highlight);color:#0b1020;}
+  /* instant highlight state for crisp frame capture */
+  .reveal .w{transition:none !important;}
 </style>
 <script>
 (function(){
+  var CFG={captions:true,inslide:true};
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function cap(){
     var c=document.getElementById('dv-caption');
@@ -52,25 +56,44 @@ const DRIVER = `
   }
   function build(s){
     var c=cap();
-    if(!s.words||!s.words.length){c.innerHTML='';c.style.opacity=0;return;}
+    if(!CFG.captions||!s.words||!s.words.length){c.innerHTML='';c.style.opacity=0;return;}
     c.style.opacity=1;
     c.innerHTML=s.words.map(function(w){return '<span class="cw">'+esc(w.text)+'</span>';}).join(' ');
   }
-  window.__dvSetup=function(tl){window.__TL=tl;window.__cur=-1;cap();};
+  function clearSpans(){
+    var els=document.querySelectorAll('.reveal .w.is-spoken,.reveal .w.was-spoken');
+    for(var i=0;i<els.length;i++){els[i].classList.remove('is-spoken','was-spoken');}
+  }
+  window.__dvSetup=function(tl,cfg){
+    window.__TL=tl;window.__cur=-1;
+    if(cfg){CFG.captions=cfg.captions!==false;CFG.inslide=cfg.inslide!==false;}
+    cap();
+  };
   window.__dvSeek=function(t){
     var tl=window.__TL||[];var s=tl.length?tl[0]:null;
     for(var i=0;i<tl.length;i++){ if(t>=tl[i].start) s=tl[i]; else break; }
     if(!s) return -1;
-    if(s.index!==window.__cur){ window.__cur=s.index; if(window.Reveal) window.Reveal.slide(s.index,0,0); build(s); }
+    if(s.index!==window.__cur){ window.__cur=s.index; if(window.Reveal) window.Reveal.slide(s.index,0,0); clearSpans(); build(s); }
+    // caption karaoke
     var c=cap();
-    if(!s.words||!s.words.length){ c.style.opacity=0; return s.index; }
-    c.style.opacity=1;
-    var spans=c.querySelectorAll('.cw');
-    for(var j=0;j<s.words.length;j++){
-      var el=spans[j]; if(!el) continue; var w=s.words[j];
-      var active = t>=w.gStart && t<w.gEnd;
-      var done = t>=w.gEnd;
-      el.className='cw'+(active?' active':'')+(done?' done':'');
+    if(CFG.captions && s.words && s.words.length){
+      c.style.opacity=1;
+      var spans=c.querySelectorAll('.cw');
+      for(var j=0;j<s.words.length;j++){
+        var el=spans[j]; if(!el) continue; var w=s.words[j];
+        var active=t>=w.gStart && t<w.gEnd; var done=t>=w.gEnd;
+        el.className='cw'+(active?' active':'')+(done?' done':'');
+      }
+    } else { c.style.opacity=0; }
+    // in-slide word highlight
+    if(CFG.inslide && s.inslide && s.inslide.length){
+      for(var k=0;k<s.inslide.length;k++){
+        var ev=s.inslide[k];
+        var sp=document.querySelector('.reveal section.present [data-w="'+ev.dataW+'"]');
+        if(!sp) continue;
+        if(t>=ev.start && t<ev.end){ sp.classList.add('is-spoken'); }
+        else { sp.classList.remove('is-spoken','was-spoken'); }
+      }
     }
     return s.index;
   };
@@ -114,18 +137,22 @@ async function main() {
       fps: { type: 'string' },
       pad: { type: 'string' },
       width: { type: 'string' },
-      height: { type: 'string' }
+      height: { type: 'string' },
+      captions: { type: 'string' },
+      inslide: { type: 'string' }
     }
   });
   const deckPath = positionals[0];
   const audioBase = positionals[1];
-  if (!deckPath || !audioBase) fail('usage: render_video.mjs <deck.html> <audioDir> --out final.mp4 [--fps 12] [--pad 0.4]');
+  if (!deckPath || !audioBase) fail('usage: render_video.mjs <deck.html> <audioDir> --out final.mp4 [--fps 12] [--pad 0.4] [--captions true|false] [--inslide true|false]');
   if (!existsSync(deckPath)) fail(`deck not found: ${deckPath}`);
 
   const fps = parseInt(values.fps || '12', 10);
   const pad = parseFloat(values.pad || '0.4');
   const width = parseInt(values.width || '1280', 10);
   const height = parseInt(values.height || '720', 10);
+  const captions = values.captions !== 'false';
+  const inslide = values.inslide !== 'false';
   const outPath = resolve(values.out || 'final.mp4');
   const workDir = join(dirname(outPath), '_video');
   const framesDir = join(workDir, 'frames');
@@ -133,23 +160,39 @@ async function main() {
   await rm(framesDir, { recursive: true, force: true });
   await mkdir(framesDir, { recursive: true });
 
+  // Load the on-slide word manifest (deck.words.json) for in-slide highlighting.
+  let deckWords = null;
+  const wordsManifestPath = resolve(deckPath).replace(/\.html?$/i, '') + '.words.json';
+  if (inslide) {
+    if (existsSync(wordsManifestPath)) {
+      deckWords = JSON.parse(await readFile(wordsManifestPath, 'utf8'));
+    } else {
+      process.stderr.write(`render_video: word manifest not found (${wordsManifestPath}); in-slide highlighting disabled.\n`);
+    }
+  }
+
   // Timeline (with per-slide pad folded into the global clock).
   const slides = await loadSlides(audioBase);
   const timeline = [];
   let cursor = 0;
+  let inslideTotal = 0;
   for (const s of slides) {
     const start = cursor;
-    let words = [];
-    if (s.words) {
-      const w = JSON.parse(await readFile(join(audioBase, s.words), 'utf8'));
-      words = w.map((x) => ({ text: x.text, gStart: +(start + x.start).toFixed(3), gEnd: +(start + x.end).toFixed(3) }));
+    let raw = [];
+    if (s.words) raw = JSON.parse(await readFile(join(audioBase, s.words), 'utf8'));
+    const words = raw.map((x) => ({ text: x.text, gStart: +(start + x.start).toFixed(3), gEnd: +(start + x.end).toFixed(3) }));
+    let inslideEvents = [];
+    if (deckWords) {
+      const slideSpans = deckWords.words.filter((x) => x.slide === s.index);
+      inslideEvents = matchInslide(slideSpans, raw, start);
+      inslideTotal += inslideEvents.length;
     }
-    timeline.push({ index: s.index, start: +start.toFixed(3), words });
+    timeline.push({ index: s.index, start: +start.toFixed(3), words, inslide: inslideEvents });
     cursor = start + s.duration + pad;
   }
   const totalDuration = cursor;
   const totalFrames = Math.ceil(totalDuration * fps);
-  process.stdout.write(`render_video: ${slides.length} slides, ${totalDuration.toFixed(1)}s, ${totalFrames} frames @ ${fps}fps\n`);
+  process.stdout.write(`render_video: ${slides.length} slides, ${totalDuration.toFixed(1)}s, ${totalFrames} frames @ ${fps}fps; captions=${captions} inslide=${inslide}(${inslideTotal} words)\n`);
 
   // Inject the caption driver into a sibling video-deck HTML.
   const deckHtml = await readFile(deckPath, 'utf8');
@@ -168,7 +211,7 @@ async function main() {
     await page.goto(pathToFileURL(videoDeckPath).href, { waitUntil: 'load' });
     await page.waitForSelector('.reveal.ready', { timeout: 20000 });
     await page.evaluate(() => window.Reveal.configure({ transition: 'none', backgroundTransition: 'none', controls: false, progress: false, slideNumber: false }));
-    await page.evaluate((tl) => window.__dvSetup(tl), timeline);
+    await page.evaluate((args) => window.__dvSetup(args.tl, args.cfg), { tl: timeline, cfg: { captions, inslide } });
     await page.waitForTimeout(400);
 
     let last = -1;

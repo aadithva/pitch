@@ -51,7 +51,7 @@ npm run demo:video` for the narrated video.
 | `scripts/tts.py` | narration → per-slide audio + word timings (edge-tts) |
 | `scripts/render_video.mjs` | deck + audio → narrated `final.mp4` with karaoke captions |
 | `scripts/validate_deck.mjs` | Checks slide count, placeholder leakage, and word-manifest parity |
-| `scripts/lib/` | `theme.mjs`, `deck.mjs` (rendering), `capture.mjs` (headless capture) |
+| `scripts/lib/` | `theme.mjs`, `deck.mjs` (rendering), `capture.mjs` (capture), `align.mjs` (narration→span matching) |
 | `assets/` | reveal.js template, `base.css`, `highlight.css`, `default_theme.json` |
 | `schemas/` | `slides.schema.json`, `project_brief.schema.json` |
 | `references/` | blueprint, narration rules, theming, video pipeline |
@@ -59,11 +59,11 @@ npm run demo:video` for the narrated video.
 | `evals/` | trigger/output checks |
 
 ## Status
-Phases 1–3 are implemented and verified: style extraction, brand-styled deck
-(HTML/PDF/PNG), AI voiceover (edge-tts), and a narrated MP4 with karaoke
-word-highlighting captions. Phase 4 (highlighting the slide text itself) and
-Phase 5 (motion, multi-provider, `.pptx`) are specified in `references/` and the
-repository `plan/`.
+Phases 1–4 are implemented and verified: style extraction, brand-styled deck
+(HTML/PDF/PNG), AI voiceover (edge-tts), and a narrated MP4 where each spoken word
+highlights **on the actual slide text** (matched to `data-w` spans) plus a karaoke
+caption bar. Phase 5 (motion polish, multi-provider, `.pptx`) is specified in
+`references/` and the repository `plan/`.
 
 ## License
 MIT.

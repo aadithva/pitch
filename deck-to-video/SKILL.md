@@ -23,11 +23,13 @@ want a polished explainer without a timeline editor.
 - `deck.pdf` — a shareable PDF (+ optional per-slide PNG frames).
 - `theme.json` / `theme.css` — the extracted visual style (reusable).
 - `narration/audio/` — per-slide narration audio + word timings (`tts.py`).
-- `final.mp4` — the narrated video with karaoke word-highlighting captions.
+- `final.mp4` — the narrated video where the spoken word highlights **on the
+  slide text** and in a karaoke caption bar, in sync with the voiceover.
 
-> **Status:** Phases 1–3 implemented — style extraction, brand-styled deck
-> (HTML/PDF), AI voiceover, and a narrated MP4 with synced word-highlighting
-> captions. Phase 4 (highlighting on the slide text itself) is next; see "Roadmap".
+> **Status:** Phases 1–4 implemented — style extraction, brand-styled deck
+> (HTML/PDF), AI voiceover, and a narrated MP4 where each spoken word highlights
+> on the actual slide text (matched to `data-w` spans) plus a karaoke caption.
+> Phase 5 (motion polish, multi-provider, `.pptx`) is next; see "Roadmap".
 
 ## Quick reference
 
@@ -82,20 +84,22 @@ visually** before declaring done (see QA).
 
 ### 5. Narrate + render the video
 Each slide's `narration` (see `references/narration-rules.md`) drives the
-voiceover. Synthesize audio + word timings, then render a narrated MP4 with
-karaoke captions (the spoken word highlights in sync):
+voiceover. Synthesize audio + word timings, then render a narrated MP4 where the
+spoken word highlights **on the slide text** and in a karaoke caption bar:
 ```bash
 # a) TTS: narration -> per-slide mp3 + word timings (+ audio/index.json)
 python3 scripts/tts.py path/to/slides.json --out build/<name> [--voice en-US-AriaNeural]
 
-# b) Video: deck + audio -> final.mp4 (browser-rendered captions, captured
-#    deterministically frame-by-frame, muxed with ffmpeg — no libass needed)
+# b) Video: deck + audio -> final.mp4 (browser-rendered, captured deterministically
+#    frame-by-frame, muxed with ffmpeg — no libass needed)
 node scripts/render_video.mjs build/<name>/deck.html build/<name> \
-  --out build/<name>/final.mp4 [--fps 12] [--pad 0.4]
+  --out build/<name>/final.mp4 [--fps 12] [--pad 0.4] [--captions true|false] [--inslide true|false]
 ```
-The captions render in the browser using the deck's theme (`--highlight` color),
-so the video is on-brand and reproducible. Full design + options:
-`references/video-pipeline.md`.
+In-slide highlighting fuzzy-matches narration words to the deck's `data-w` spans
+(skipping stopwords), so the actual slide words light up as they're spoken. Both
+the captions and on-slide highlights use the deck's theme (`--highlight`), so the
+video is on-brand and reproducible. Toggle either layer with `--captions false`
+or `--inslide false`. Full design + options: `references/video-pipeline.md`.
 
 ## QA (do this before finishing)
 1. Run `export_pdf.mjs ... --png frames/` and **open several frames** (cover, a
@@ -128,7 +132,8 @@ python3 -m venv .venv
 - ✅ **Phase 1** — style extraction + brand-styled deck (HTML/PDF/PNG).
 - ✅ **Phase 2** — per-slide narration scripts (exported as reveal.js speaker notes).
 - ✅ **Phase 3** — AI voiceover (`edge-tts`) + narrated MP4 with karaoke captions.
-- ⬜ **Phase 4** — highlight the words on the slide text itself (not just captions).
+- ✅ **Phase 4** — highlight the words on the slide text itself (matched to
+  `data-w` spans), in sync with the voiceover, alongside the karaoke caption.
 - ⬜ **Phase 5** — motion polish, multi-voice/provider, `.pptx` export.
 
 See the repository `plan/` directory for the full research-backed plan.

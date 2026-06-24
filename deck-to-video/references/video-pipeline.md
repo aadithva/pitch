@@ -46,32 +46,26 @@ Priority for timestamps: TTS-native (edge-tts/ElevenLabs) → faster-whisper →
    Deterministic and reproducible; transitions are disabled so every frame shows a
    clean highlight state.
 
-## Stage 4 — In-slide karaoke (next; the differentiator)
-1. **Match** narration words → on-slide `<span data-w>` (order + fuzzy text match
-   using `deck.words.json`). Emit a per-slide timeline.
-2. Inject the timeline into `deck.html` as `window.__NARRATION__` (the template
-   already has the inert hook in `assets/deck_template.html`).
-3. The deck's `<audio>` `timeupdate` toggles `.is-spoken` on the active span;
-   `assets/highlight.css` defines the highlight + motion. Past words get
-   `.was-spoken`; `.reveal.narration-active` dims upcoming words.
-4. **Record** with `record_video.mjs` (Playwright): for reproducibility, drive the
-   highlight from a computed clock and advance slides on each slide's audio
-   duration, capturing via `recordVideo` (don't rely on real-time audio playout in
-   headless — mux audio after).
+## Stage 4 — In-slide highlighting (implemented)
+The actual slide words light up as they're spoken, in addition to the caption.
+1. **Match** narration words → on-slide `<span data-w>` words via
+   `scripts/lib/align.mjs` (`matchInslide`): normalize (lowercase + strip
+   punctuation), skip stopwords and words < 3 chars, and queue-match per slide so
+   each on-slide word highlights the first time its text is spoken. Returns
+   global-time `{ dataW, start, end }` events from `deck.words.json` + the slide's
+   `words.json`.
+2. `render_video.mjs` folds these events into the timeline and the injected driver
+   toggles `.is-spoken` (from `assets/highlight.css`) on the matching span at each
+   frame — only the currently-spoken word is marked (no trailing state), for a
+   clean karaoke look.
+3. Captions and in-slide highlights are independent layers: `--captions
+   true|false` and `--inslide true|false`. Both use the deck theme's `--highlight`.
+4. Transitions on `.w` are forced off during capture so every frame shows a crisp
+   highlight state (deterministic).
 
-## MVP fallback — caption-bar karaoke (Phase 3)
-Simpler path that ships value first:
-1. `export_pdf.mjs --png` → one still per slide (already implemented).
-2. `make_ass.py`: `words.json` → ASS `\kf` karaoke subtitle.
-3. ffmpeg per slide: `-loop 1 -i slide.png -i sN.mp3 -vf "ass=sN.ass"` → segment;
-   then concat → `final.mp4`.
-
-## Stage 5 — Assemble (`scripts/assemble.py`)
-- Primary: mux `recording.webm` + concatenated narration audio.
-- Fallback: concat per-slide segments.
-- `ffmpeg -f concat -safe 0 -i list.txt -c copy final.mp4`.
-
-## Why not OS screen-recording
+> Not used: an earlier plan burned ASS `\kf` karaoke captions with ffmpeg, but
+> this environment's ffmpeg lacks libass. Rendering the highlight in the browser
+> (above) avoids that dependency entirely and reuses the deck's own styling.
 Deterministic Playwright capture gives real CSS animations **and** reproducibility,
 runs headless, and needs no virtual audio device (BlackHole/Soundflower). See the
 architecture comparison in `plan/01-architecture.md`.
