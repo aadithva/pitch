@@ -47,6 +47,7 @@ want a polished explainer without a timeline editor.
 | Write narration | Add `narration` to each slide (rules) | `references/narration-rules.md` |
 | Synthesize voiceover | `python3 scripts/tts.py <slides.json> --out <dir>` | `references/video-pipeline.md` |
 | Render the video | `node scripts/render_video.mjs <deck.html> <dir> --out final.mp4` | `references/video-pipeline.md` |
+| Splice in a live demo | `node scripts/splice_demo.mjs <deckVideo> <demo.mp4> --out final.mp4 --at <sec>` | `references/demo-capture.md` |
 
 ## Workflow (6 stages)
 
@@ -158,7 +159,7 @@ See the repository `plan/` directory for the full research-backed plan.
 ```
 SKILL.md                 # this router
 references/              # deep-dive guidance (read when relevant)
-scripts/                 # extract_style, capture_demo, render_deck, export_pdf, tts, render_video, validate_deck (+ lib/)
+scripts/                 # extract_style, capture_demo, render_deck, export_pdf, tts, render_video, splice_demo, validate_deck (+ lib/)
 assets/                  # deck_template.html, base.css, highlight.css, default_theme.json
 schemas/                 # project_brief + slides JSON contracts
 examples/                # demo-project (slides.json) + sample-brand (style extraction)

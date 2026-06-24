@@ -51,6 +51,7 @@ npm run demo:video` for the narrated video.
 | `scripts/export_pdf.mjs` | `deck.html` → `deck.pdf` (+ optional PNG frames) |
 | `scripts/tts.py` | narration → per-slide audio + word timings (edge-tts) |
 | `scripts/render_video.mjs` | deck + audio → narrated `final.mp4` with karaoke captions |
+| `scripts/splice_demo.mjs` | insert the `demo.mp4` recording into the video as a live-demo section |
 | `scripts/validate_deck.mjs` | Checks slide count, placeholder leakage, and word-manifest parity |
 | `scripts/lib/` | `theme.mjs`, `deck.mjs` (rendering), `capture.mjs` (capture), `align.mjs` (narration→span matching) |
 | `assets/` | reveal.js template, `base.css`, `highlight.css`, `default_theme.json` |

@@ -10,6 +10,7 @@
     "render-deck": "scripts/render_deck.mjs",
     "export-pdf": "scripts/export_pdf.mjs",
     "render-video": "scripts/render_video.mjs",
+    "splice-demo": "scripts/splice_demo.mjs",
     "validate-deck": "scripts/validate_deck.mjs"
   },
   "scripts": {

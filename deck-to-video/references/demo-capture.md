@@ -53,12 +53,24 @@ The `showcase` layout frames the screenshot prominently. Because the deck and th
 captures live in the same `build/<name>/` folder, the relative `src` resolves for
 both browser viewing and the Playwright video render.
 
+## Splice the recording into the narrated video
+Turn the standalone recording into a "live demo" section inside `final.mp4`:
+```bash
+node scripts/splice_demo.mjs <deckVideo.mp4> demo/demo.mp4 --out final-with-demo.mp4 \
+  [--at <sec>] [--narration "Here's the product in action."] [--max-demo <sec>]
+```
+It normalizes the recording to the deck video's resolution/fps, gives it a short
+spoken intro (via `.venv` edge-tts, optional), and concatenates. With `--at <sec>`
+it splits the deck video and inserts the demo at that timestamp — pick a **slide
+boundary** (the silent pad gap between slides) for a clean cut; without `--at` it
+appends to the end. Requires `ffmpeg`.
+
 ## Notes & limits
 - Interactive/AI features that need a backend may render only their entry/empty
   state when run locally without keys — the UI still showcases well. Use
   `--wait-selector` to wait for a specific element, or `--url` to point at a
   fully-deployed instance.
-- The screen recording (`demo.mp4`) is a standalone artifact; it can be appended
-  to the narrated video as a "live demo" coda (Phase 5).
+- Capture at `--width 1280 --height 720` if you want the recording to fill a
+  720p video with no letterboxing when spliced.
 - Requires Playwright Chromium (`npx playwright install chromium`) and `ffmpeg`
   (for the webm→mp4 conversion). Static serving uses `python3`.
