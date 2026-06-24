@@ -9,9 +9,13 @@ designed below. (Sourcing: `research/02`, `research/03`; `plan/01-architecture.m
 slides.json (+narration) ──► tts.py        ──► audio/sNNN.mp3 + sNNN.words.json + index.json
 deck.html + audio/index  ──► render_video.mjs ──► frames (Playwright) + voiceover (ffmpeg) ──► final.mp4
 ```
-The captions are rendered **in the browser** (the deck's own theme, `--highlight`
-color) and captured deterministically frame-by-frame, then muxed with the
-narration via ffmpeg. **No libass / `ass` filter is required** — any ffmpeg works.
+The video is rendered deterministically (Playwright frame capture + ffmpeg mux);
+**no libass / `ass` filter is required** — any ffmpeg works. By **default the video
+is clean**: a narrated deck with **no caption bar and no on-slide highlight**.
+Subtitles and word-highlighting are **opt-in** — ask the user, then pass
+`--captions true` and/or `--inslide true`. When enabled, both render in the
+browser using the deck's theme (the active word recolors to `--accent`, not a
+block), captured frame-by-frame.
 
 ### Commands
 ```bash

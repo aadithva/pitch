@@ -101,22 +101,26 @@ visually** before declaring done (see QA).
 
 ### 5. Narrate + render the video
 Each slide's `narration` (see `references/narration-rules.md`) drives the
-voiceover. Synthesize audio + word timings, then render a narrated MP4 where the
-spoken word highlights **on the slide text** and in a karaoke caption bar:
+voiceover.
+
+> **Ask the user first.** Before rendering, ask whether they want **subtitles
+> (captions)** and on-slide **word highlighting**. Both are **off by default** —
+> the clean default is a narrated deck with no caption bar and no highlight. Only
+> pass `--captions true` / `--inslide true` if the user opts in.
+
 ```bash
 # a) TTS: narration -> per-slide mp3 + word timings (+ audio/index.json)
 python3 scripts/tts.py path/to/slides.json --out build/<name> [--voice en-US-AriaNeural]
 
 # b) Video: deck + audio -> final.mp4 (browser-rendered, captured deterministically
-#    frame-by-frame, muxed with ffmpeg — no libass needed)
+#    frame-by-frame, muxed with ffmpeg — no libass needed). Clean by default:
 node scripts/render_video.mjs build/<name>/deck.html build/<name> \
-  --out build/<name>/final.mp4 [--fps 12] [--pad 0.4] [--captions true|false] [--inslide true|false]
+  --out build/<name>/final.mp4 [--fps 12] [--pad 0.4] [--captions true] [--inslide true]
 ```
-In-slide highlighting fuzzy-matches narration words to the deck's `data-w` spans
-(skipping stopwords), so the actual slide words light up as they're spoken. Both
-the captions and on-slide highlights use the deck's theme (`--highlight`), so the
-video is on-brand and reproducible. Toggle either layer with `--captions false`
-or `--inslide false`. Full design + options: `references/video-pipeline.md`.
+`--captions true` adds a subtitle bar that recolors the current spoken word in the
+brand accent (and reserves a bottom safe-zone so it never covers slide content).
+`--inslide true` recolors the matching on-slide word in the accent as it's spoken
+(subtle — no background block). Full design + options: `references/video-pipeline.md`.
 
 ## QA (do this before finishing)
 1. Run `export_pdf.mjs ... --png frames/` and **open several frames** (cover, a

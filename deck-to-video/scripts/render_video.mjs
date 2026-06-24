@@ -35,16 +35,16 @@ function run(cmd, args) {
 // --- the in-page caption + in-slide highlight + seek driver -----------------
 const DRIVER = `
 <style>
-  /* Reserve a safe zone at the bottom so captions never cover slide content. */
-  .reveal .slides section { padding-bottom: 16% !important; }
+  /* Reserve a bottom safe zone ONLY when captions are shown. */
+  .reveal.dv-captions .slides section { padding-bottom: 16% !important; }
   #dv-caption{position:fixed;left:8%;right:8%;bottom:3.5%;margin:0 auto;max-width:84%;
     text-align:center;font-family:var(--font-body);font-size:27px;line-height:1.4;
     color:var(--text);background:rgba(2,6,23,0.62);padding:0.5em 0.85em;border-radius:14px;
     z-index:99999;opacity:0;box-shadow:0 8px 30px rgba(0,0,0,.4);
     backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
-  #dv-caption .cw{padding:0 .14em;border-radius:6px;color:#cbd5e1;}
+  #dv-caption .cw{padding:0 .12em;color:#94a3b8;}
   #dv-caption .cw.done{color:var(--text);}
-  #dv-caption .cw.active{background:var(--highlight);color:#0b1020;}
+  #dv-caption .cw.active{color:var(--accent);}
   /* instant highlight state for crisp frame capture */
   .reveal .w{transition:none !important;}
   /* instant highlight state for crisp frame capture */
@@ -72,6 +72,8 @@ const DRIVER = `
   window.__dvSetup=function(tl,cfg){
     window.__TL=tl;window.__cur=-1;
     if(cfg){CFG.captions=cfg.captions!==false;CFG.inslide=cfg.inslide!==false;}
+    var rv=document.querySelector('.reveal');
+    if(rv && CFG.captions) rv.classList.add('dv-captions');
     cap();
   };
   window.__dvSeek=function(t){
@@ -156,8 +158,8 @@ async function main() {
   const pad = parseFloat(values.pad || '0.4');
   const width = parseInt(values.width || '1280', 10);
   const height = parseInt(values.height || '720', 10);
-  const captions = values.captions !== 'false';
-  const inslide = values.inslide !== 'false';
+  const captions = values.captions === 'true';
+  const inslide = values.inslide === 'true';
   const outPath = resolve(values.out || 'final.mp4');
   const workDir = join(dirname(outPath), '_video');
   const framesDir = join(workDir, 'frames');
