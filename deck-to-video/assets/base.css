@@ -151,16 +151,20 @@
 }
 .layout-diagram .diagram .mermaid svg { max-width: 100%; max-height: 54vh; height: auto; }
 
-/* --- Layout: showcase (large product screenshot) --- */
-.layout-showcase h2 { font-size: 1.45em; }
-.layout-showcase .body { font-size: 0.72em; color: var(--muted); margin: 0.5em 0 0; }
-.layout-showcase .shot {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  min-height: 0; margin: 0.6em 0 0;
+/* --- Layout: showcase (UI is the hero — small text left, enlarged screenshot right) --- */
+.layout-showcase .sc-split {
+  display: grid; grid-template-columns: 34% 1fr; gap: 5%;
+  align-items: center; width: 100%;
 }
-.layout-showcase .shot img {
-  max-width: 100%; max-height: 42vh; border-radius: 14px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+.layout-showcase .sc-text h2 { font-size: 1.3em; }
+.layout-showcase .sc-text .body { font-size: 0.78em; color: var(--muted); margin-top: 0.6em; max-width: 100%; }
+.layout-showcase .sc-shot {
+  display: flex; align-items: center; justify-content: center; min-width: 0;
+}
+.layout-showcase .sc-shot img {
+  width: 100%; max-height: 82vh; object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.55);
   border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
 }
 

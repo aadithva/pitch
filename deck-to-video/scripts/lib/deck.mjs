@@ -206,11 +206,15 @@ export function renderSlide(slide, slideIndex, ctx) {
       break;
 
     case 'showcase':
-      inner = `${k}
-    ${h2()}
-    ${rule}
-    ${bodyP()}
-    <div class="shot">${visualHtml(slide, ctx)}</div>`;
+      inner = `<div class="sc-split">
+      <div class="sc-text">
+        ${k}
+        ${h2()}
+        ${rule}
+        ${bodyP()}
+      </div>
+      <div class="sc-shot">${visualHtml(slide, ctx)}</div>
+    </div>`;
       break;
 
     case 'list':
