@@ -1,0 +1,25 @@
+{
+  "name": "Deckaster",
+  "tagline": "Turn any project into a self-explanatory deck and a narrated, word-highlighted video.",
+  "problem": "Designers and builders ship fast, but turning that work into a clear deck and video takes hours in slide and timeline editors.",
+  "users": "Designers and \"vibecoders\" who are closest to the work and would rather keep building than spend an afternoon editing.",
+  "insight": "If an agent can write the slides, it can write the narration, speak it, and sync the highlights automatically.",
+  "solution": "One skill that runs five stages end-to-end, so you never touch a timeline editor.",
+  "how_it_works": "An HTML-first, deterministic pipeline: extract style, generate a reveal.js deck, narrate with AI voice, then capture and render the video.",
+  "key_features": [
+    { "heading": "On-brand", "text": "Pulls colors and fonts from your project automatically." },
+    { "heading": "Self-narrating", "text": "Writes and speaks a script that complements the slides." },
+    { "heading": "Karaoke sync", "text": "Highlights each word on the slide as it is spoken." }
+  ],
+  "results": {
+    "summary": "From idea to explainer in minutes.",
+    "metrics": [ { "value": "10x", "label": "faster than hand-editing a narrated walkthrough" } ],
+    "quote": "It felt like the deck explained itself."
+  },
+  "whats_next": [
+    "In-slide motion accents and auto-animate transitions",
+    "Multiple voices and languages",
+    "One-click export to PowerPoint"
+  ],
+  "cta": "Point it at your project and get back a deck and a video."
+}

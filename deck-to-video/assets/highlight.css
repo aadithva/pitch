@@ -1,0 +1,36 @@
+/* highlight.css — karaoke word-highlighting styles.
+   Every narration-relevant word on a slide is wrapped by render_deck.mjs as:
+       <span class="w" data-w="GLOBAL_INDEX">word</span>
+   In Phase 4, a JS timeline driven by the narration audio toggles `.is-spoken`
+   on the active word. These styles define the highlight + motion. */
+
+.reveal .w {
+  position: relative;
+  transition: color 140ms ease, background-color 140ms ease, transform 140ms ease;
+  border-radius: 4px;
+  padding: 0 0.04em;
+}
+
+/* The active (currently spoken) word */
+.reveal .w.is-spoken {
+  color: var(--bg);
+  background-color: var(--highlight);
+  transform: translateY(-0.02em) scale(1.04);
+}
+
+/* Words already spoken stay subtly emphasized so the eye can track progress */
+.reveal .w.was-spoken {
+  color: var(--text);
+}
+
+/* Words not yet reached are slightly dimmed during playback (class added to
+   <body> only while a narration timeline is active, so static decks are unaffected) */
+.reveal.narration-active .w:not(.is-spoken):not(.was-spoken) {
+  color: var(--muted);
+}
+
+/* Reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .reveal .w { transition: background-color 80ms linear, color 80ms linear; }
+  .reveal .w.is-spoken { transform: none; }
+}

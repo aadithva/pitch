@@ -1,0 +1,22 @@
+{
+  "name": "deck-to-video",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent skill: turn a project into a self-explanatory, brand-styled deck and (later) a narrated, word-highlighted video.",
+  "bin": {
+    "extract-style": "scripts/extract_style.mjs",
+    "render-deck": "scripts/render_deck.mjs",
+    "export-pdf": "scripts/export_pdf.mjs"
+  },
+  "scripts": {
+    "demo": "node scripts/extract_style.mjs examples/demo-project --out build/demo && node scripts/render_deck.mjs examples/demo-project/slides.json build/demo/theme.css --out build/demo/deck.html"
+  },
+  "dependencies": {
+    "node-vibrant": "^4.0.3",
+    "reveal.js": "^5.2.1"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.49.0"
+  }
+}
