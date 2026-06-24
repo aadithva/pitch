@@ -20,6 +20,7 @@ export function mergeTheme(base, override = {}) {
     ...override,
     colors: { ...base.colors, ...(override.colors || {}) },
     fonts: { ...base.fonts, ...(override.fonts || {}) },
+    fontWeights: { ...(base.fontWeights || {}), ...(override.fontWeights || {}) },
     googleFonts: override.googleFonts ?? base.googleFonts,
     logo: override.logo ?? base.logo,
     source: override.source ?? base.source
@@ -38,6 +39,7 @@ export async function loadTheme(path) {
 export function compileThemeCss(theme) {
   const c = theme.colors || {};
   const f = theme.fonts || {};
+  const w = theme.fontWeights || {};
   return `:root{
   --bg: ${c.background};
   --surface: ${c.surface};
@@ -49,6 +51,9 @@ export function compileThemeCss(theme) {
   --highlight: ${c.highlight};
   --font-heading: ${f.heading};
   --font-body: ${f.body};
+  --font-mono: ${f.mono || "'Space Mono', ui-monospace, SFMono-Regular, monospace"};
+  --weight-heading: ${w.heading || 700};
+  --weight-body: ${w.body || 400};
 }
 html, body, .reveal { background: var(--bg); }
 `;

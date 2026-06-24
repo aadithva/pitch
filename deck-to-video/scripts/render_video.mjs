@@ -35,13 +35,18 @@ function run(cmd, args) {
 // --- the in-page caption + in-slide highlight + seek driver -----------------
 const DRIVER = `
 <style>
-  #dv-caption{position:fixed;left:7%;right:7%;bottom:5%;margin:0 auto;max-width:86%;
-    text-align:center;font-family:var(--font-body);font-size:30px;line-height:1.4;
-    color:var(--text);background:rgba(2,6,23,0.55);padding:0.55em 0.9em;border-radius:14px;
-    z-index:99999;opacity:0;box-shadow:0 8px 30px rgba(0,0,0,.35);}
+  /* Reserve a safe zone at the bottom so captions never cover slide content. */
+  .reveal .slides section { padding-bottom: 16% !important; }
+  #dv-caption{position:fixed;left:8%;right:8%;bottom:3.5%;margin:0 auto;max-width:84%;
+    text-align:center;font-family:var(--font-body);font-size:27px;line-height:1.4;
+    color:var(--text);background:rgba(2,6,23,0.62);padding:0.5em 0.85em;border-radius:14px;
+    z-index:99999;opacity:0;box-shadow:0 8px 30px rgba(0,0,0,.4);
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
   #dv-caption .cw{padding:0 .14em;border-radius:6px;color:#cbd5e1;}
   #dv-caption .cw.done{color:var(--text);}
   #dv-caption .cw.active{background:var(--highlight);color:#0b1020;}
+  /* instant highlight state for crisp frame capture */
+  .reveal .w{transition:none !important;}
   /* instant highlight state for crisp frame capture */
   .reveal .w{transition:none !important;}
 </style>

@@ -93,6 +93,21 @@ function luminance(hex) {
   return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
 }
 
+/** HSL saturation (0..1) — used to find a brand color with real "pop". */
+function saturation(hex) {
+  if (!hex) return 0;
+  const n = hex.replace('#', '');
+  if (n.length < 6) return 0;
+  const r = parseInt(n.slice(0, 2), 16) / 255;
+  const g = parseInt(n.slice(2, 4), 16) / 255;
+  const b = parseInt(n.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return 0;
+  const d = max - min;
+  return l > 0.5 ? d / (2 - max - min) : d / (max + min);
+}
+
 // ---- signal extractors ------------------------------------------------------
 
 /** Named color tokens from CSS/SCSS :root and bare custom properties. */
@@ -190,16 +205,32 @@ async function vibrantPalette(logoPath) {
 
 function extractFonts(allText, pkg) {
   const families = new Set();
-  const google = new Set();
+  const googleNames = new Set();   // family display names
+  const googleSpecs = new Set();   // raw "Family:wght@..." specs (exact weights preserved)
+  const roles = {};                // heading / body / mono -> family name (from CSS vars)
 
   for (const text of allText) {
+    // @font-face families
     for (const m of text.matchAll(/@font-face[^}]*?font-family\s*:\s*["']?([^"';]+)/gi)) {
       families.add(m[1].trim());
     }
-    for (const m of text.matchAll(/fonts\.googleapis\.com\/css2?\?([^"'`)]+)/gi)) {
-      for (const fam of m[1].matchAll(/family=([^&:]+)(?::[^&]*)?/g)) {
-        google.add(decodeURIComponent(fam[1].replace(/\+/g, ' ')));
+    // Google Fonts <link> hrefs — capture each family spec verbatim (with weights)
+    for (const m of text.matchAll(/fonts\.googleapis\.com\/css2?\?([^"'`)\s]+)/gi)) {
+      for (const fam of m[1].matchAll(/family=([^&]+)/g)) {
+        const spec = fam[1];
+        googleSpecs.add(spec);
+        googleNames.add(decodeURIComponent(spec.split(':')[0].replace(/\+/g, ' ')).trim());
       }
+    }
+    // Font-role CSS vars: --font-display / --font-heading / --font-body / --font-mono (and --ds-*)
+    for (const m of text.matchAll(/--(?:ds-)?font-(display|heading|title|body|text|sans|mono)\s*:\s*([^;}{]+)/gi)) {
+      const role = m[1].toLowerCase();
+      const famMatch = m[2].match(/["']?([^"',;()]+)/);
+      const name = famMatch && famMatch[1].trim();
+      if (!name || /^(var|inherit|initial|unset)/i.test(name)) continue;
+      if ((role === 'display' || role === 'heading' || role === 'title') && !roles.heading) roles.heading = name;
+      else if ((role === 'body' || role === 'text' || role === 'sans') && !roles.body) roles.body = name;
+      else if (role === 'mono' && !roles.mono) roles.mono = name;
     }
   }
   if (pkg) {
@@ -210,11 +241,20 @@ function extractFonts(allText, pkg) {
       }
     }
   }
-  return { families: [...families], google: [...google] };
+  return { families: [...families], google: [...googleNames], googleSpecs: [...googleSpecs], roles };
 }
 
 function titleCaseFamily(f) {
   return f.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Heaviest numeric weight present in a Google Fonts family spec (default 400). */
+function maxWeightFromSpec(spec) {
+  if (!spec) return 400;
+  const w = spec.match(/wght@([^&]+)/);
+  if (!w) return 400;
+  const nums = w[1].match(/\d{3}/g);
+  return nums && nums.length ? Math.max(...nums.map(Number)) : 400;
 }
 
 // ---- resolution -------------------------------------------------------------
@@ -240,6 +280,22 @@ function resolveTheme(base, signals, mode) {
   colors.secondary = brandSecondary;
   colors.accent = brandAccent;
 
+  // The accent should "pop". If the chosen accent is desaturated (e.g. white/
+  // gray on a monochrome brand), swap in the most saturated brand candidate.
+  if (saturation(colors.accent) < 0.25) {
+    const candidates = [
+      pick(named, /(^|[-_])(accent|tertiary|highlight|brand|primary|secondary)([-_]|$)/),
+      brandSecondary, brandPrimary,
+      vibrant && vibrant.vibrant, vibrant && vibrant.lightVibrant, vibrant && vibrant.darkVibrant
+    ].filter(Boolean);
+    let best = colors.accent, bestSat = saturation(colors.accent);
+    for (const c of candidates) {
+      const s = saturation(c);
+      if (s > bestSat) { bestSat = s; best = c; }
+    }
+    colors.accent = best;
+  }
+
   // Optional background adoption: only if a clear brand bg exists and matches mode.
   const brandBg = pick(named, /(^|[-_])(background|bg|surface|base|canvas)([-_]|$)/);
   if (mode === 'light') {
@@ -252,20 +308,45 @@ function resolveTheme(base, signals, mode) {
   }
 
   // Fonts
-  const headingFamily = fonts.google[0] || fonts.families[0];
-  const bodyFamily = fonts.google[1] || fonts.google[0] || fonts.families[1] || fonts.families[0];
+  const r = fonts.roles || {};
+  const isMono = (n) => /mono/i.test(n || '');
+  const nonMono = (arr) => arr.filter((n) => !isMono(n));
+  const headingFamily = r.heading || nonMono(fonts.google)[0] || nonMono(fonts.families)[0] || null;
+  const bodyFamily = r.body || nonMono(fonts.google)[1] || nonMono(fonts.google)[0] || nonMono(fonts.families)[1] || nonMono(fonts.families)[0] || null;
+  const monoFamily = r.mono || fonts.google.find(isMono) || fonts.families.find(isMono) || null;
+
+  // Map family name -> the project's exact Google Fonts spec (with weights).
+  const specByName = new Map();
+  for (const spec of fonts.googleSpecs || []) {
+    const key = decodeURIComponent(spec.split(':')[0].replace(/\+/g, ' ')).trim().toLowerCase();
+    specByName.set(key, spec);
+  }
   const googleFonts = [];
-  if (fonts.google[0]) googleFonts.push(fonts.google[0].replace(/ /g, '+') + ':wght@500;700');
-  if (fonts.google[1]) googleFonts.push(fonts.google[1].replace(/ /g, '+') + ':wght@400;600');
+  const seen = new Set();
+  const weights = {};
+  for (const [slot, fam] of [['heading', headingFamily], ['body', bodyFamily], ['mono', monoFamily]]) {
+    if (!fam) continue;
+    const key = fam.toLowerCase();
+    const spec = specByName.get(key) || (fam.replace(/ /g, '+') + ':wght@400;700');
+    weights[slot] = maxWeightFromSpec(spec);
+    if (!seen.has(key)) { seen.add(key); googleFonts.push(spec); }
+  }
 
   const themeFonts = { ...base.fonts };
   if (headingFamily) themeFonts.heading = `'${titleCaseFamily(headingFamily)}', ${base.fonts.heading}`;
   if (bodyFamily) themeFonts.body = `'${titleCaseFamily(bodyFamily)}', ${base.fonts.body}`;
+  themeFonts.mono = monoFamily
+    ? `'${titleCaseFamily(monoFamily)}', ${base.fonts.mono || "'Space Mono', ui-monospace, monospace"}`
+    : (base.fonts.mono || "'Space Mono', ui-monospace, SFMono-Regular, monospace");
 
   return mergeTheme(base, {
     source: 'extracted',
     colors,
     fonts: themeFonts,
+    fontWeights: {
+      heading: weights.heading || base.fontWeights?.heading || 700,
+      body: weights.body || base.fontWeights?.body || 400
+    },
     googleFonts: googleFonts.length ? googleFonts : base.googleFonts,
     logo: signals.logo || null
   });

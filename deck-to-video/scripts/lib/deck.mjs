@@ -84,7 +84,7 @@ export function pickLayout(slide) {
 }
 
 function kickerHtml(slide) {
-  const label = KICKER[slide.type];
+  const label = slide.eyebrow || KICKER[slide.type];
   return label ? `<span class="kicker">${esc(label)}</span>` : '';
 }
 
@@ -209,8 +209,8 @@ export function renderSlide(slide, slideIndex, ctx) {
       inner = `${k}
     ${h2()}
     ${rule}
-    <div class="shot">${visualHtml(slide, ctx)}</div>
-    ${bodyP()}`;
+    ${bodyP()}
+    <div class="shot">${visualHtml(slide, ctx)}</div>`;
       break;
 
     case 'list':
