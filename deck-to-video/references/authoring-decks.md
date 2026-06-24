@@ -40,6 +40,21 @@ A bare top-level array `[ {slide}, ... ]` is also accepted.
   "How it works". Renders at view time via CDN (needs network); use an image for
   fully-offline decks.
 
+## Showcasing the live product
+If you captured the running UI with `capture_demo.mjs` (see
+`references/demo-capture.md`), put the screenshots on slides so viewers see the
+actual product. The **`showcase`** layout frames one screenshot large:
+```json
+{ "type": "features", "layout": "showcase",
+  "title": "HatchLab — an AI idea graph.",
+  "visual": { "type": "image", "src": "demo/shots/04-hatchlab.png", "alt": "HatchLab" },
+  "body": "Start with a challenge, converge on one buildable idea.",
+  "narration": "And this is HatchLab, where you hatch your idea on an AI idea graph." }
+```
+`split` (image beside text) and `diagram` (centered image) also accept image
+visuals. Keep the deck and captures in the same `build/<name>/` folder so the
+relative `src` resolves for both viewing and the video render.
+
 ## Word highlighting (how it's wired)
 `render_deck.mjs` wraps each word of `title/subtitle/body/bullets/cards/stat
 label/quote` in `<span class="w" data-w="N">`. The indices are contiguous and

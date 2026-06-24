@@ -46,6 +46,7 @@ npm run demo:video` for the narrated video.
 |------|---------|
 | `SKILL.md` | Agent-facing workflow + quick reference |
 | `scripts/extract_style.mjs` | Project → `theme.json`/`theme.css` (tokens, logo palette, fonts) |
+| `scripts/capture_demo.mjs` | Run the project's UI → live screenshots + screen recording (`demo/`) |
 | `scripts/render_deck.mjs` | `slides.json` + theme → self-contained `deck.html` (+ word manifest) |
 | `scripts/export_pdf.mjs` | `deck.html` → `deck.pdf` (+ optional PNG frames) |
 | `scripts/tts.py` | narration → per-slide audio + word timings (edge-tts) |

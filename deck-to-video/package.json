@@ -6,6 +6,7 @@
   "description": "Agent skill: turn a project into a self-explanatory, brand-styled deck and (later) a narrated, word-highlighted video.",
   "bin": {
     "extract-style": "scripts/extract_style.mjs",
+    "capture-demo": "scripts/capture_demo.mjs",
     "render-deck": "scripts/render_deck.mjs",
     "export-pdf": "scripts/export_pdf.mjs",
     "render-video": "scripts/render_video.mjs",

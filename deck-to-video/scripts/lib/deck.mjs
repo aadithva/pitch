@@ -76,6 +76,7 @@ function hasVisual(slide) {
 export function pickLayout(slide) {
   let l = slide.layout || TYPE_LAYOUT[slide.type] || 'statement';
   if (l === 'split' && !hasVisual(slide)) l = 'statement';
+  if (l === 'showcase' && !hasVisual(slide)) l = 'statement';
   if (l === 'diagram' && !hasVisual(slide)) l = slide.bullets?.length ? 'list' : 'statement';
   if (l === 'stat' && !slide.stat) l = 'statement';
   if (l === 'cards' && !(slide.cards && slide.cards.length)) l = slide.bullets?.length ? 'list' : 'statement';
@@ -201,6 +202,14 @@ export function renderSlide(slide, slideIndex, ctx) {
     ${h2()}
     ${rule}
     <div class="diagram">${visualHtml(slide, ctx)}</div>
+    ${bodyP()}`;
+      break;
+
+    case 'showcase':
+      inner = `${k}
+    ${h2()}
+    ${rule}
+    <div class="shot">${visualHtml(slide, ctx)}</div>
     ${bodyP()}`;
       break;
 

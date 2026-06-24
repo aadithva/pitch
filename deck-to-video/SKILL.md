@@ -22,6 +22,8 @@ want a polished explainer without a timeline editor.
 - `deck.html` — a single self-contained reveal.js deck, styled in the project's brand.
 - `deck.pdf` — a shareable PDF (+ optional per-slide PNG frames).
 - `theme.json` / `theme.css` — the extracted visual style (reusable).
+- `demo/shots/*.png` + `demo/demo.mp4` — **live screenshots + a screen recording**
+  of the project's actual running UI (`capture_demo.mjs`), to showcase in the deck.
 - `narration/audio/` — per-slide narration audio + word timings (`tts.py`).
 - `final.mp4` — the narrated video where the spoken word highlights **on the
   slide text** and in a karaoke caption bar, in sync with the voiceover.
@@ -37,6 +39,7 @@ want a polished explainer without a timeline editor.
 |------|---------|---------|
 | Understand the project | Read its README/manifest/source → fill `schemas/project_brief.schema.json` | `references/authoring-decks.md` |
 | Adopt the project's look | `node scripts/extract_style.mjs <projectDir> --out <dir>` | `references/theming.md` |
+| Capture a live UI demo | `node scripts/capture_demo.mjs <projectDir> --out <dir>` | `references/demo-capture.md` |
 | Plan the slides | Write `slides.json` per the blueprint + `schemas/slides.schema.json` | `references/deck-blueprint.md` |
 | Render the deck | `node scripts/render_deck.mjs <slides.json> <theme.json> --out deck.html` | this file |
 | Export PDF / frames | `node scripts/export_pdf.mjs deck.html --out deck.pdf --png frames/` | this file |
@@ -45,7 +48,7 @@ want a polished explainer without a timeline editor.
 | Synthesize voiceover | `python3 scripts/tts.py <slides.json> --out <dir>` | `references/video-pipeline.md` |
 | Render the video | `node scripts/render_video.mjs <deck.html> <dir> --out final.mp4` | `references/video-pipeline.md` |
 
-## Workflow (5 stages)
+## Workflow (6 stages)
 
 ### 1. Understand the project
 Read the project (README, `package.json`/manifest, key source, `docs/`). Produce a
@@ -65,9 +68,22 @@ so frontends built with React/Vite/Next.js are picked up cleanly. Writes
 brand's primary/secondary/accent + fonts (and a dark brand background if
 present). Use `--mode light` for a light deck. See `references/theming.md`.
 
+### 2b. Capture a live demo (if the project has a UI)
+```bash
+node scripts/capture_demo.mjs <projectDir> --out build/<name> \
+  [--routes /,/feature.html] [--record true|false] [--url http://localhost:PORT]
+```
+Detects a UI (framework dev server with `node_modules`, a static site, or a live
+`--url`), runs it, and captures per-route **screenshots** (`demo/shots/*.png`) plus
+a **screen recording** of a scroll/nav flow (`demo/demo.mp4`). Embed the
+screenshots in the deck (Stage 3) so viewers see the actual running product. See
+`references/demo-capture.md`.
+
 ### 3. Generate the deck
 Turn `project_brief.json` into a `slides.json` (array of typed slides) following
-`references/deck-blueprint.md` and `schemas/slides.schema.json`. Then:
+`references/deck-blueprint.md` and `schemas/slides.schema.json`. Reference any
+captured screenshots as image visuals (the `showcase` layout frames them large).
+Then:
 ```bash
 node scripts/render_deck.mjs path/to/slides.json build/<name>/theme.json --out build/<name>/deck.html
 ```
@@ -142,7 +158,7 @@ See the repository `plan/` directory for the full research-backed plan.
 ```
 SKILL.md                 # this router
 references/              # deep-dive guidance (read when relevant)
-scripts/                 # extract_style, render_deck, export_pdf, tts, render_video, validate_deck (+ lib/)
+scripts/                 # extract_style, capture_demo, render_deck, export_pdf, tts, render_video, validate_deck (+ lib/)
 assets/                  # deck_template.html, base.css, highlight.css, default_theme.json
 schemas/                 # project_brief + slides JSON contracts
 examples/                # demo-project (slides.json) + sample-brand (style extraction)

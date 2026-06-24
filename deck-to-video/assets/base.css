@@ -127,6 +127,20 @@
 }
 .layout-diagram .diagram .mermaid svg { max-width: 100%; max-height: 58vh; height: auto; }
 
+/* --- Layout: showcase (large product screenshot) --- */
+.layout-showcase { display: flex; flex-direction: column; }
+.layout-showcase h2 { font-size: 1.35em; }
+.layout-showcase .shot {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  min-height: 0; margin: 0.25em 0;
+}
+.layout-showcase .shot img {
+  max-width: 100%; max-height: 50vh; border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+.layout-showcase .body { font-size: 0.72em; color: var(--muted); margin-top: 0.2em; }
+
 /* --- Layout: closing / cta --- */
 .layout-closing { display: flex; flex-direction: column; justify-content: center; }
 .layout-closing h2 { font-size: 2.1em; max-width: 15em; }
