@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>deck-to-video — turn any project into a narrated explainer</title>
+<meta name="description" content="An Agent Skill that turns any project into a brand-styled deck and an AI-narrated video — with live UI demos." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#08090c; --surface:#101218; --line:rgba(255,255,255,.09);
+    --text:#eef1f6; --muted:#9aa3b2; --primary:#22d3ee; --accent:#f5b642;
+    --mono:'Space Mono',ui-monospace,SFMono-Regular,monospace;
+    --head:'Space Grotesk',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;background:
+      radial-gradient(120% 80% at 100% -10%, rgba(34,211,238,.10), transparent 55%),
+      var(--bg); color:var(--text); font-family:var(--body); line-height:1.6;
+      -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+  .kicker{font-family:var(--mono);font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--primary);display:inline-flex;align-items:center;gap:.6em}
+  .kicker::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--accent)}
+  h1{font-family:var(--head);font-weight:700;font-size:clamp(40px,8vw,76px);letter-spacing:-.03em;line-height:1.02;margin:.35em 0 .2em}
+  h2{font-family:var(--head);font-weight:700;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;margin:0 0 .5em}
+  p.lead{font-size:clamp(17px,2.4vw,21px);color:var(--muted);max-width:30em;margin:0}
+  header{padding:96px 0 40px}
+  section{padding:46px 0;border-top:1px solid var(--line)}
+  .cmd{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);
+      border-radius:14px;padding:16px 18px;margin:30px 0 10px;max-width:660px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  .cmd code{font-family:var(--mono);font-size:15px;color:var(--text);overflow-x:auto;white-space:nowrap;flex:1}
+  .cmd code .tok{color:var(--primary)}
+  .copy{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;
+      background:var(--primary);color:#04161a;border:0;border-radius:8px;padding:9px 12px;font-weight:700;flex:0 0 auto}
+  .copy:active{transform:translateY(1px)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:26px}
+  .card{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--primary);border-radius:16px;padding:18px}
+  .card .n{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.1em}
+  .card h3{font-family:var(--head);font-size:18px;margin:.4em 0 .3em}
+  .card p{margin:0;color:var(--muted);font-size:14px}
+  ul.req{list-style:none;padding:0;margin:18px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+  ul.req li{font-size:14px;color:var(--muted)}
+  ul.req b{color:var(--text);font-weight:600}
+  .demos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:24px}
+  .demo{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;transition:border-color .2s}
+  .demo:hover{border-color:var(--primary)}
+  .demo .t{font-family:var(--head);font-weight:700;font-size:18px}
+  .demo .d{color:var(--muted);font-size:14px;margin-top:4px}
+  footer{padding:50px 0 70px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:.04em;border-top:1px solid var(--line)}
+  .accent{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="kicker">Agent Skill</span>
+    <h1>deck&#8209;to&#8209;video</h1>
+    <p class="lead">Turn any project into a brand&#8209;styled deck and an AI&#8209;narrated explainer video — with a live demo of the actual UI. One skill, run by your agent.</p>
+  </header>
+
+  <section id="install">
+    <h2>Install</h2>
+    <p style="color:var(--muted);margin:0;max-width:34em">Run this in your terminal. It drops the skill into your skills directory and installs its dependencies.</p>
+    <div class="cmd">
+      <code id="cmd"><span class="tok">curl</span> -fsSL https://vibehub.microsoft.com/app/deck-to-video/install.sh | <span class="tok">bash</span></code>
+      <button class="copy" onclick="copyCmd(this)">Copy</button>
+    </div>
+    <p class="hint">Installs to <span class="accent">~/.claude/skills/deck-to-video</span> &nbsp;·&nbsp; override with <span class="accent">SKILLS_DIR=…</span></p>
+  </section>
+
+  <section id="how">
+    <h2>What it does</h2>
+    <p style="color:var(--muted);margin:0;max-width:34em">Point your agent at a project and ask for a deck or video. The skill runs five layers:</p>
+    <div class="grid">
+      <div class="card"><div class="n">01</div><h3>Extract style</h3><p>Pulls the project's real colors, fonts, and logo into an on&#8209;brand theme.</p></div>
+      <div class="card"><div class="n">02</div><h3>Generate deck</h3><p>Writes a self&#8209;explanatory deck and renders it as themed reveal.js.</p></div>
+      <div class="card"><div class="n">03</div><h3>Narrate</h3><p>Writes &amp; speaks a script with AI voice (edge&#8209;tts), free and local.</p></div>
+      <div class="card"><div class="n">04</div><h3>Render video</h3><p>Captures the deck deterministically and muxes the voiceover into an MP4.</p></div>
+      <div class="card"><div class="n">05</div><h3>Live demo</h3><p>Runs the actual app and records the real UI &amp; user flow to showcase.</p></div>
+    </div>
+  </section>
+
+  <section id="requirements">
+    <h2>Requirements</h2>
+    <ul class="req">
+      <li><b>Node 20+</b> — deck + video render</li>
+      <li><b>ffmpeg</b> — audio/video mux</li>
+      <li><b>Chromium</b> — installed by the script</li>
+      <li><b>Python 3</b> — AI voiceover (edge&#8209;tts)</li>
+    </ul>
+  </section>
+
+  <section id="demos">
+    <h2>Built with it</h2>
+    <p style="color:var(--muted);margin:0;max-width:34em">Real vibe&#8209;coded projects, explained by the skill.</p>
+    <div class="demos">
+      <a class="demo" href="./demos/designshift/final-video/DesignShift-explainer.mp4"><div class="t">DesignShift</div><div class="d">AI&#8209;led design lifecycle · HatchLab idea graph</div></a>
+      <a class="demo" href="./demos/flowsense/final-video/FlowSense-explainer.mp4"><div class="t">FlowSense</div><div class="d">AI interaction&#8209;quality scoring · Next.js + Azure</div></a>
+    </div>
+  </section>
+
+  <footer>
+    deck-to-video · an Agent Skill · made for designers &amp; vibecoders
+  </footer>
+
+</div>
+<script>
+  function copyCmd(btn){
+    var text = document.getElementById('cmd').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      var old = btn.textContent; btn.textContent = 'Copied';
+      setTimeout(function(){ btn.textContent = old; }, 1400);
+    });
+  }
+</script>
+</body>
+</html>

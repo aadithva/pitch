@@ -1,0 +1,105 @@
+{
+  "title": "DesignShift — AI-led Design Lifecycle",
+  "slides": [
+    {
+      "id": "cover",
+      "type": "cover",
+      "title": "DesignShift",
+      "subtitle": "An AI-led design lifecycle for the FHL hackathon — and HatchLab, an AI idea graph.",
+      "narration": "This is DesignShift. An AI-led design lifecycle, built for the hackathon.",
+      "eyebrow": "Microsoft FHL · Project Explainer"
+    },
+    {
+      "id": "problem",
+      "type": "problem",
+      "title": "AI can help at every design step — but the help is scattered.",
+      "body": "Designers juggle a dozen tools and prompts, with no single place that guides the work.",
+      "narration": "AI can help at every design step, but today that help is scattered across a dozen tools."
+    },
+    {
+      "id": "users",
+      "type": "users",
+      "title": "Built for designers and makers racing through Fix, Hack, Learn.",
+      "body": "The people who need momentum, not more tabs.",
+      "narration": "It's built for designers and makers racing through Fix, Hack, and Learn."
+    },
+    {
+      "id": "insight",
+      "type": "insight",
+      "title": "What if the whole design lifecycle was AI-led, in one place?",
+      "body": "One hub that turns good ideas into great ones.",
+      "narration": "So what if the whole design lifecycle was AI-led, and lived in one place?"
+    },
+    {
+      "id": "solution",
+      "type": "solution",
+      "layout": "showcase",
+      "title": "DesignShift: start with a task, follow an AI-led lifecycle.",
+      "visual": {
+        "type": "image",
+        "src": "demo/shots/01-home.png",
+        "alt": "DesignShift home — Start with a task"
+      },
+      "body": "Jump straight into an AI-assisted path for whatever you need.",
+      "narration": "DesignShift lets you start with a task and follow an AI-led lifecycle, end to end."
+    },
+    {
+      "id": "ailab",
+      "type": "how",
+      "layout": "showcase",
+      "title": "An AI lab for every phase of the work.",
+      "visual": {
+        "type": "image",
+        "src": "demo/shots/02-ai-lab.png",
+        "alt": "DesignShift AI lab"
+      },
+      "body": "Pick a phase, get the right AI-assisted activities.",
+      "narration": "An AI lab maps every phase of the work to the right assisted activities."
+    },
+    {
+      "id": "hatchlab",
+      "type": "features",
+      "layout": "showcase",
+      "title": "HatchLab — hatch your idea on an AI idea graph.",
+      "visual": {
+        "type": "image",
+        "src": "demo/shots/04-jamlab-index.png",
+        "alt": "HatchLab — Hatch your idea"
+      },
+      "body": "Start with a challenge, explore connected possibilities, converge on one buildable idea.",
+      "narration": "And this is HatchLab. You start with a challenge, and hatch your idea on an AI idea graph."
+    },
+    {
+      "id": "resources",
+      "type": "content",
+      "layout": "showcase",
+      "title": "Grab-and-go prompts to pressure-test every idea.",
+      "visual": {
+        "type": "image",
+        "src": "demo/shots/03-resources.png",
+        "alt": "DesignShift resources"
+      },
+      "body": "Bash bugs, crit designs, and script your demo.",
+      "narration": "Grab-and-go prompts help you pressure-test ideas, bash bugs, and crit designs."
+    },
+    {
+      "id": "next",
+      "type": "next",
+      "title": "From scattered AI tips to one AI-led design hub.",
+      "bullets": [
+        "More AI-assisted workflows per phase",
+        "Deeper HatchLab idea graphs",
+        "Team analytics and templates"
+      ],
+      "narration": "It turns scattered AI tips into one design hub, and it's only getting deeper."
+    },
+    {
+      "id": "cta",
+      "type": "cta",
+      "title": "Launch DesignShift. Hatch your next idea.",
+      "body": "Fix. Hack. Learn — with AI in the loop.",
+      "cta": "Open DesignShift",
+      "narration": "So launch DesignShift, and hatch your next idea."
+    }
+  ]
+}

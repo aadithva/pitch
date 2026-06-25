@@ -5,3 +5,11 @@ tmp/
 build/
 .deck-theme/
 deck-to-video/.venv/
+
+# demos: track docs (md/json/css), ignore heavy media + big html
+demos/**/*.mp4
+demos/**/*.pdf
+demos/**/*.png
+demos/**/*-deck.html
+# generated skill bundle
+site/*.tar.gz
