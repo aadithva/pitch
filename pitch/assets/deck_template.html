@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{TITLE}}</title>
+  {{GOOGLE_FONTS}}
+  <style>
+/* === reset.css + reveal.css (inlined) === */
+{{REVEAL_CSS}}
+/* === theme.css (brand tokens) === */
+{{THEME_CSS}}
+/* === base.css (layout) === */
+{{BASE_CSS}}
+/* === highlight.css (karaoke) === */
+{{HIGHLIGHT_CSS}}
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+{{SLIDES}}
+    </div>
+  </div>
+  <script>
+/* === reveal.js (inlined UMD build) === */
+{{REVEAL_JS}}
+  </script>
+  <script>
+    // Word-timeline data (populated in Phase 3/4; empty for a static deck).
+    window.__NARRATION__ = {{NARRATION_JSON}};
+
+    Reveal.initialize({
+      hash: true,
+      controls: true,
+      progress: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      backgroundTransition: 'fade',
+      width: 1280,
+      height: 720,
+      margin: 0.04
+    });
+
+    /* === Karaoke highlight driver (Phase 4) ===
+       Inert unless window.__NARRATION__ contains per-word timings.
+       Kept here so the static deck and the video deck share one template. */
+    (function initKaraoke() {
+      var data = window.__NARRATION__;
+      if (!data || !Array.isArray(data.slides) || !data.slides.length) return;
+      // Implemented in Phase 4: bind <audio> timeupdate -> toggle .is-spoken
+      // on span[data-w]. No-op for now.
+    })();
+  </script>
+  {{EXTRA_JS}}
+</body>
+</html>

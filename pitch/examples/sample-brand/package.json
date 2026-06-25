@@ -1,0 +1,11 @@
+{
+  "name": "nebula",
+  "version": "1.0.0",
+  "description": "Sample branded project for testing deck-to-video style extraction.",
+  "dependencies": {
+    "@fontsource/poppins": "^5.0.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}

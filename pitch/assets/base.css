@@ -1,0 +1,209 @@
+/* base.css — layout + typography for the generated deck.
+   All brand-specific values come from theme.css (:root custom properties),
+   so this file is brand-agnostic. */
+
+.reveal {
+  font-family: var(--font-body);
+  color: var(--text);
+  font-size: 32px;
+  /* subtle brand depth so dark decks don't read as flat black */
+  background:
+    radial-gradient(120% 90% at 100% -10%,
+      color-mix(in srgb, var(--primary) 9%, transparent), transparent 55%),
+    var(--bg);
+}
+.reveal .slides { text-align: left; }
+
+/* Vertically center content in every slide with comfortable margins. */
+.reveal .slides section {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 7% 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Per-slide index, mono, top-right (hidden on the cover). */
+.reveal .slides { counter-reset: slidenum; }
+.reveal .slides > section { counter-increment: slidenum; }
+.reveal .slides > section::after {
+  content: counter(slidenum, decimal-leading-zero);
+  position: absolute; top: 6.5%; right: 8%;
+  font-family: var(--font-mono); font-size: 0.58em; letter-spacing: 0.12em;
+  color: var(--muted); opacity: 0.55;
+}
+.reveal .slides > section.layout-title::after { content: none; }
+
+/* Headings */
+.reveal h1, .reveal h2, .reveal h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
+  color: var(--text);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.32em;
+  text-transform: none;
+}
+.reveal h1 { font-size: 3.1em; }
+.reveal h2 { font-size: 1.9em; max-width: 17em; }
+.reveal h3 { font-size: 1.0em; letter-spacing: -0.01em; }
+.reveal p  { line-height: 1.5; margin: 0 0 0.5em; font-weight: var(--weight-body); }
+
+.reveal a { color: var(--primary); }
+.reveal strong { color: var(--primary); font-weight: inherit; }
+.reveal .muted { color: var(--muted); }
+
+/* --- eyebrow / kicker — mono, technical, with an accent tick --- */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.6em;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 1.1em;
+  display: inline-flex; align-items: center; gap: 0.7em;
+}
+.kicker::before {
+  content: ""; width: 0.7em; height: 0.7em; border-radius: 2px;
+  background: var(--accent); display: inline-block;
+}
+
+/* accent rule under titles — thin and short */
+.accent-rule {
+  width: 56px; height: 3px; border: 0; margin: 1.1em 0 0;
+  background: var(--accent); border-radius: 2px; opacity: 0.9;
+}
+
+.subtitle { font-size: 1.05em; color: var(--muted); max-width: 20em; line-height: 1.45; }
+.body { font-size: 1em; color: var(--muted); max-width: 24em; }
+
+/* --- Layout: title / cover --- */
+.layout-title h1 { font-size: 4em; letter-spacing: -0.035em; }
+.layout-title .subtitle { margin-top: 0.5em; font-size: 1.1em; max-width: 22em; }
+
+/* --- Layout: statement (big single idea) --- */
+.layout-statement h2 { font-size: 2.25em; max-width: 15em; }
+.layout-statement .body { margin-top: 0.2em; }
+
+/* --- Layout: split (text + visual) --- */
+.layout-split .split {
+  display: grid; grid-template-columns: 1.05fr 1fr; gap: 7%;
+  align-items: center; width: 100%;
+}
+.layout-split .visual {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border-radius: 18px; overflow: hidden;
+  aspect-ratio: 4 / 3;
+}
+.layout-split .visual img { width: 100%; height: 100%; object-fit: cover; }
+
+/* --- Layout: cards (features) --- */
+.layout-cards .cards {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4%;
+  margin-top: 1em; width: 100%;
+}
+.card {
+  position: relative; min-width: 0;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 18px; padding: 1.15em 1.2em;
+}
+.card::before {
+  content: ""; position: absolute; top: 0; left: 1.2em; right: 1.2em; height: 3px;
+  background: var(--accent); border-radius: 0 0 3px 3px; opacity: 0.85;
+}
+.card .icon { font-size: 1.5em; display: block; margin-bottom: 0.45em; }
+.card h3 { color: var(--text); margin-bottom: 0.3em; font-size: 1.05em; }
+.card p { font-size: 0.74em; color: var(--muted); margin: 0; line-height: 1.45; }
+
+/* --- Layout: stat (big number) --- */
+.layout-stat .stat-value {
+  font-family: var(--font-heading); font-weight: var(--weight-heading); line-height: 1;
+  font-size: 6em; letter-spacing: -0.03em;
+  background: linear-gradient(100deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  margin-top: 0.08em;
+}
+.layout-stat .stat-label { font-size: 1.05em; color: var(--muted); margin-top: 0.3em; max-width: 18em; }
+.layout-stat .quote { margin-top: 1.3em; }
+
+/* --- Layout: list --- */
+.reveal ul { list-style: none; margin: 0.6em 0 0; padding: 0; }
+.reveal .slides li {
+  position: relative; padding-left: 1.4em; margin: 0.55em 0; line-height: 1.4; max-width: 24em;
+}
+.reveal .slides li::before {
+  content: ""; position: absolute; left: 0; top: 0.52em;
+  width: 0.5em; height: 0.5em; border-radius: 2px; background: var(--accent);
+}
+
+/* --- Layout: diagram --- */
+.layout-diagram .diagram {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  min-height: 0; margin-top: 0.6em;
+}
+.layout-diagram .diagram img { max-width: 100%; max-height: 100%; }
+.layout-diagram .diagram .mermaid {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  font-family: var(--font-body); color: var(--muted);
+}
+.layout-diagram .diagram .mermaid svg { max-width: 100%; max-height: 52vh; height: auto; }
+
+/* --- native flow pipeline (visual.type = "flow", no Mermaid/CDN) --- */
+.diagram .flow {
+  display: flex; align-items: stretch; justify-content: center; flex-wrap: wrap;
+  gap: 0.3em 0; width: 100%;
+}
+.flow-step {
+  box-sizing: border-box;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  border-top: 3px solid var(--accent);
+  border-radius: 12px; padding: 0.8em 0.7em;
+  font-size: 0.6em; color: var(--text); line-height: 1.25;
+  width: 8em; min-height: 3em;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.flow-arrow { align-self: center; color: var(--accent); font-size: 0.75em; padding: 0 0.22em; flex: 0 0 auto; }
+
+/* --- Layout: showcase (UI is the hero — small text left, enlarged screenshot right) --- */
+.reveal .slides section.layout-showcase { padding: 5.5% 6%; }
+.layout-showcase .sc-split {
+  display: grid; grid-template-columns: 29% 1fr; gap: 4%;
+  align-items: center; width: 100%;
+}
+.layout-showcase .sc-text h2 { font-size: 1.25em; }
+.layout-showcase .sc-text .body { font-size: 0.76em; color: var(--muted); margin-top: 0.6em; max-width: 100%; }
+.layout-showcase .sc-shot {
+  display: flex; align-items: center; justify-content: center; min-width: 0;
+}
+.layout-showcase .sc-shot img {
+  width: 100%; max-height: 90vh; object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+/* --- Layout: closing / cta --- */
+.layout-closing h2 { font-size: 2.6em; max-width: 14em; }
+.layout-closing .body { margin-top: 0.2em; }
+.layout-closing .cta-step {
+  display: inline-block; margin-top: 1.2em; padding: 0.6em 1.3em;
+  background: var(--primary); color: var(--bg); border-radius: 999px;
+  font-family: var(--font-mono); font-weight: 700; font-size: 0.7em;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+
+/* --- quote --- */
+.quote { border-left: 3px solid var(--accent); padding-left: 0.9em; font-style: italic; color: var(--text); max-width: 22em; }
+.quote .attribution {
+  display: block; font-style: normal; color: var(--muted); font-size: 0.78em;
+  margin-top: 0.5em; font-family: var(--font-mono); letter-spacing: 0.05em;
+}
+
+/* reveal chrome */
+.reveal .progress { color: var(--primary); height: 3px; }
+.reveal .controls { color: var(--primary); }
+

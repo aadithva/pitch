@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "slides.schema.json",
+  "title": "Deck",
+  "description": "The deck specification the LLM produces. An ordered array of slides. render_deck.mjs turns this + a theme into a self-contained reveal.js deck.html with per-word spans for later karaoke highlighting.",
+  "type": "object",
+  "required": ["slides"],
+  "additionalProperties": false,
+  "properties": {
+    "title": { "type": "string", "description": "Document title (browser tab / metadata)." },
+    "meta": {
+      "type": "object",
+      "description": "Optional deck-level metadata.",
+      "additionalProperties": true
+    },
+    "slides": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/slide" }
+    }
+  },
+  "definitions": {
+    "slide": {
+      "type": "object",
+      "required": ["type", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Stable slide id (e.g. 'cover', 'problem')." },
+        "type": {
+          "type": "string",
+          "description": "Semantic slide role; drives the default layout.",
+          "enum": ["cover", "problem", "users", "insight", "solution", "how", "features", "results", "next", "cta", "team", "appendix", "content", "statement"]
+        },
+        "layout": {
+          "type": "string",
+          "description": "Override the visual layout. If omitted, derived from `type`.",
+          "enum": ["title", "statement", "split", "cards", "stat", "diagram", "showcase", "list", "closing"]
+        },
+        "title": { "type": "string", "description": "Slide title. Best practice: make it the takeaway, not a topic label." },
+        "subtitle": { "type": "string" },
+        "body": { "type": "string", "description": "One short sentence of supporting copy (keep on-slide text minimal)." },
+        "bullets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Use sparingly; prefer cards/visuals. Max ~5."
+        },
+        "cards": {
+          "type": "array",
+          "description": "For 'features'/'cards' layouts: 2-3 cards.",
+          "items": {
+            "type": "object",
+            "required": ["heading"],
+            "additionalProperties": false,
+            "properties": {
+              "heading": { "type": "string" },
+              "text": { "type": "string" },
+              "icon": { "type": "string", "description": "Optional emoji or short glyph." }
+            }
+          }
+        },
+        "stat": {
+          "type": "object",
+          "description": "For 'stat'/'results' layouts: a single big number.",
+          "additionalProperties": false,
+          "properties": {
+            "value": { "type": "string" },
+            "label": { "type": "string" }
+          }
+        },
+        "quote": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "text": { "type": "string" },
+            "attribution": { "type": "string" }
+          }
+        },
+        "visual": {
+          "type": "object",
+          "description": "Optional supporting visual.",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "type": "string", "enum": ["image", "mermaid", "none"] },
+            "src": { "type": "string", "description": "Image path/URL (for type=image)." },
+            "code": { "type": "string", "description": "Mermaid source (for type=mermaid)." },
+            "alt": { "type": "string" }
+          }
+        },
+        "narration": { "type": "string", "description": "The spoken script for this slide (Phase 3). Should complement, not repeat, the on-slide text." },
+        "notes": { "type": "string", "description": "Optional presenter notes." }
+      }
+    }
+  }
+}

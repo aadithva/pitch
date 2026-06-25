@@ -1,0 +1,44 @@
+{
+  "skill": "deck-to-video",
+  "cases": [
+    {
+      "name": "trigger-repo-to-deck",
+      "prompt": "Turn this repo into a slide deck I can share.",
+      "expect": [
+        "Selects the deck-to-video skill.",
+        "Runs extract_style.mjs on the project dir.",
+        "Writes a slides.json following the blueprint and schema.",
+        "Runs render_deck.mjs to produce deck.html and export_pdf.mjs for deck.pdf.",
+        "Reviews exported PNG frames before finishing."
+      ]
+    },
+    {
+      "name": "trigger-explainer-video",
+      "prompt": "Make a short narrated explainer video for my project.",
+      "expect": [
+        "Selects the deck-to-video skill.",
+        "Generates deck + per-slide narration.",
+        "Explains the narrated-video stages (TTS + capture + ffmpeg) per references/video-pipeline.md."
+      ]
+    },
+    {
+      "name": "style-extraction",
+      "prompt": "Use examples/sample-brand as the project and show the extracted theme.",
+      "command": "node scripts/extract_style.mjs examples/sample-brand --out build/sample-brand",
+      "expect": [
+        "theme.json primary is #7c3aed, secondary #db2777, accent #f59e0b.",
+        "background adopted as the dark brand color #160f2e.",
+        "heading font resolves to Poppins, body to IBM Plex Sans."
+      ]
+    },
+    {
+      "name": "render-contract",
+      "prompt": "Render the demo deck.",
+      "command": "node scripts/render_deck.mjs examples/demo-project/slides.json --out build/demo/deck.html",
+      "expect": [
+        "deck.html contains 10 <section> slides and no leftover {{PLACEHOLDER}}.",
+        "deck.words.json word count equals the number of data-w spans in deck.html."
+      ]
+    }
+  ]
+}

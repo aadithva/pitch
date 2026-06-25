@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "project_brief.schema.json",
+  "title": "ProjectBrief",
+  "description": "Stage-1 output: a structured understanding of the project, used to drive deck generation. Fields map 1:1 onto the deck blueprint slides.",
+  "type": "object",
+  "required": ["name", "tagline", "problem", "solution"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string", "description": "Project name (shown on the cover)." },
+    "tagline": { "type": "string", "description": "One-line mission / value proposition." },
+    "problem": { "type": "string", "description": "The pain/gap that exists today (Slide 1)." },
+    "users": { "type": "string", "description": "Who this is for / who feels the pain (Slide 2)." },
+    "insight": { "type": "string", "description": "The non-obvious realization that makes the solution possible (Slide 3)." },
+    "solution": { "type": "string", "description": "What was built; the core value (Slide 4)." },
+    "how_it_works": { "type": "string", "description": "Key technical/design approach for the architecture slide (Slide 5)." },
+    "key_features": {
+      "type": "array",
+      "description": "2-3 standout capabilities (Slide 6).",
+      "items": {
+        "type": "object",
+        "required": ["heading"],
+        "additionalProperties": false,
+        "properties": {
+          "heading": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "description": "Measurable outcomes / traction (Slide 7).",
+      "additionalProperties": false,
+      "properties": {
+        "summary": { "type": "string" },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["value", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "value": { "type": "string" },
+              "label": { "type": "string" }
+            }
+          }
+        },
+        "quote": { "type": "string" }
+      }
+    },
+    "whats_next": {
+      "type": "array",
+      "description": "Roadmap items (Slide 8).",
+      "items": { "type": "string" }
+    },
+    "cta": { "type": "string", "description": "What you want the audience to do now (Slide 9)." },
+    "team": {
+      "type": "array",
+      "description": "Optional: who built it (Slide 10).",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string" }
+        }
+      }
+    }
+  }
+}

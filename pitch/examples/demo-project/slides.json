@@ -1,0 +1,96 @@
+{
+  "title": "Deckaster — Project Explainer",
+  "slides": [
+    {
+      "id": "cover",
+      "type": "cover",
+      "title": "Deckaster",
+      "subtitle": "Turn any project into a self-explanatory deck and a narrated, word-highlighted video.",
+      "narration": "Meet Deckaster. It turns any project into a deck and a narrated video that explains itself."
+    },
+    {
+      "id": "problem",
+      "type": "problem",
+      "title": "Great work goes unexplained because making a polished walkthrough is slow.",
+      "body": "Designers and builders ship fast, but turning that into a clear deck and video takes hours in slide and timeline editors.",
+      "narration": "Here's the problem. People build great things, but explaining them well is painfully slow."
+    },
+    {
+      "id": "users",
+      "type": "users",
+      "title": "Built for designers and vibecoders who'd rather build than narrate.",
+      "body": "The people closest to the work are the worst-placed to spend an afternoon in a video editor.",
+      "narration": "It's for designers and vibecoders who would rather keep building than wrestle with editing tools."
+    },
+    {
+      "id": "insight",
+      "type": "insight",
+      "title": "The deck already knows the script — so the video should make itself.",
+      "body": "If an agent can write the slides, it can write the narration, speak it, and sync the highlights automatically.",
+      "narration": "The key insight: if the agent can write the slides, it can also narrate them and sync the highlights."
+    },
+    {
+      "id": "solution",
+      "type": "solution",
+      "title": "One skill, five stages, zero timeline editing.",
+      "bullets": [
+        "Understand the project",
+        "Adopt its visual style",
+        "Generate a self-explanatory deck",
+        "Narrate it with AI voice",
+        "Render a word-highlighted video"
+      ],
+      "visual": { "type": "none" },
+      "narration": "Deckaster runs as a single skill with five stages, so you never touch a timeline editor."
+    },
+    {
+      "id": "how",
+      "type": "how",
+      "title": "An HTML-first, deterministic pipeline.",
+      "visual": {
+        "type": "mermaid",
+        "code": "flowchart LR\n  A[Project] --> B[Extract style]\n  B --> C[Generate deck]\n  C --> D[Narrate + timestamps]\n  D --> E[Render video]\n  E --> F[final.mp4]",
+        "alt": "Pipeline from project to final video"
+      },
+      "narration": "Under the hood it's an HTML-first pipeline that renders deterministically, so results are reproducible."
+    },
+    {
+      "id": "features",
+      "type": "features",
+      "title": "What makes it different.",
+      "cards": [
+        { "icon": "\ud83c\udfa8", "heading": "On-brand", "text": "Pulls colors and fonts from your project automatically." },
+        { "icon": "\ud83d\udde3\ufe0f", "heading": "Self-narrating", "text": "Writes and speaks a script that complements the slides." },
+        { "icon": "\u2728", "heading": "Karaoke sync", "text": "Highlights each word on the slide as it is spoken." }
+      ],
+      "narration": "Three things set it apart: it's on-brand, it narrates itself, and it highlights words as they're spoken."
+    },
+    {
+      "id": "results",
+      "type": "results",
+      "title": "From idea to explainer in minutes.",
+      "stat": { "value": "10x", "label": "faster than hand-editing a narrated walkthrough" },
+      "quote": { "text": "It felt like the deck explained itself.", "attribution": "Early tester" },
+      "narration": "In testing it was about ten times faster than hand-editing a narrated walkthrough."
+    },
+    {
+      "id": "next",
+      "type": "next",
+      "title": "Where it's going.",
+      "bullets": [
+        "In-slide motion accents and auto-animate transitions",
+        "Multiple voices and languages",
+        "One-click export to PowerPoint"
+      ],
+      "narration": "Next up: richer motion, more voices and languages, and one-click PowerPoint export."
+    },
+    {
+      "id": "cta",
+      "type": "cta",
+      "title": "Point it at your project. Get back a deck and a video.",
+      "body": "No timeline. No editing. Just your work, explained.",
+      "cta": "Try the skill",
+      "narration": "Point Deckaster at your project, and get back a deck and a video. Give it a try."
+    }
+  ]
+}

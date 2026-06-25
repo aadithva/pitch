@@ -1,0 +1,18 @@
+/* highlight.css — optional on-slide word emphasis (opt-in via --inslide true).
+   render_deck.mjs wraps every narration word as <span class="w" data-w="i">word</span>.
+   When enabled, the video driver toggles `.is-spoken` on the active word. The style
+   is a subtle accent color change (not a block) so it scales to any text size. */
+
+.reveal .w {
+  transition: color 120ms ease;
+}
+
+/* The active (currently spoken) word — subtle accent recolor, no background block. */
+.reveal .w.is-spoken {
+  color: var(--accent);
+}
+
+/* Reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .reveal .w { transition: none; }
+}
