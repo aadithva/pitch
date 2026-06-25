@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # package-skill.sh — bundle the deck-to-video skill into site/deck-to-video.tar.gz
-# for hosting (VibeHub / any static host). Excludes node_modules, build, .venv.
+# for hosting (GitHub Release or any static host). Excludes node_modules, build, .venv.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NAME="pitch"

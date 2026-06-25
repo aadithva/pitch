@@ -6,7 +6,7 @@
 # Overrides (env vars):
 #   SKILLS_DIR     where the skill goes     (default: ~/.claude/skills)
 #   COMMANDS_DIR   where commands go        (default: ~/.claude/commands)
-#   PITCH_BASE_URL where to fetch from      (default: the VibeHub app URL)
+#   PITCH_BASE_URL where to fetch from      (default: the GitHub Release URL)
 set -euo pipefail
 
 NAME="pitch"
