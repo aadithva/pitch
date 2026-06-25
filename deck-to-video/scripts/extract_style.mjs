@@ -74,6 +74,22 @@ function rgbToHex(r, g, b) {
   return '#' + c(r) + c(g) + c(b);
 }
 
+function hslToHex(h, s, l) {
+  s /= 100; l /= 100;
+  const k = (n) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  const toHex = (x) => Math.round(255 * x).toString(16).padStart(2, '0');
+  return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
+}
+
+/** Linear blend between two hex colors (t=0 -> a, t=1 -> b). */
+function mixHex(a, b, t) {
+  const p = (h) => [1, 3, 5].map((i) => parseInt(h.replace('#', '').slice(i - 1, i + 1), 16));
+  const [ar, ag, ab] = p(a), [br, bg, bb] = p(b);
+  return rgbToHex(ar + (br - ar) * t, ag + (bg - ag) * t, ab + (bb - ab) * t);
+}
+
 function parseColor(value) {
   if (!value) return null;
   const v = value.trim().toLowerCase();
@@ -81,6 +97,9 @@ function parseColor(value) {
   if (hex) return hex;
   const rgb = v.match(/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
   if (rgb) return rgbToHex(+rgb[1], +rgb[2], +rgb[3]);
+  // HSL — wrapped `hsl(187 94% 43%)` or bare shadcn `187 94% 43%`
+  const hsl = v.match(/^(?:hsla?\(\s*)?(\d+(?:\.\d+)?)\s*[, ]\s*(\d+(?:\.\d+)?)%\s*[, ]\s*(\d+(?:\.\d+)?)%/);
+  if (hsl) return hslToHex(+hsl[1], +hsl[2], +hsl[3]);
   return null;
 }
 
@@ -232,6 +251,21 @@ function extractFonts(allText, pkg) {
       else if ((role === 'body' || role === 'text' || role === 'sans') && !roles.body) roles.body = name;
       else if (role === 'mono' && !roles.mono) roles.mono = name;
     }
+    // next/font/google imports (Next.js / shadcn): import { Space_Grotesk } from 'next/font/google'
+    for (const m of text.matchAll(/import\s*\{([^}]+)\}\s*from\s*['"]next\/font\/google['"]/g)) {
+      for (const f of m[1].split(',')) {
+        const name = f.trim().replace(/\s+as\s+\w+/i, '').replace(/_/g, ' ').trim();
+        if (name && /^[A-Z]/.test(name)) families.add(name);
+      }
+    }
+    // next/font role mapping: const x = Space_Grotesk({ ..., variable: '--font-heading' })
+    for (const m of text.matchAll(/([A-Z][A-Za-z0-9_]+)\s*\(\s*\{[^}]*?variable\s*:\s*['"]--font-([a-z-]+)['"]/g)) {
+      const fam = m[1].replace(/_/g, ' ');
+      const role = m[2].toLowerCase();
+      if (/(head|display|title)/.test(role) && !roles.heading) roles.heading = fam;
+      else if (/(body|sans|text)/.test(role) && !roles.body) roles.body = fam;
+      else if (/mono/.test(role) && !roles.mono) roles.mono = fam;
+    }
   }
   if (pkg) {
     const deps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
@@ -296,15 +330,22 @@ function resolveTheme(base, signals, mode) {
     colors.accent = best;
   }
 
-  // Optional background adoption: only if a clear brand bg exists and matches mode.
-  const brandBg = pick(named, /(^|[-_])(background|bg|surface|base|canvas)([-_]|$)/);
+  // Optional background + surface/text adoption for dark brands.
+  const brandBg = pick(named, /(^|[-_])(background|bg|base|canvas)([-_]|$)/);
+  const brandSurface = pick(named, /(^|[-_])(card|surface|popover|panel|elevated)([-_]|$)/);
+  const brandText = pick(named, /(^|[-_])(foreground|text|ink|fg)([-_]|$)/);
+  const brandMuted = pick(named, /(^|[-_])(muted[-_]?foreground|muted[-_]?fg|secondary[-_]?foreground|subtle)([-_]|$)/);
   if (mode === 'light') {
     colors.background = (brandBg && luminance(brandBg) > 0.6 ? brandBg : '#ffffff');
-    colors.surface = '#f1f5f9';
-    colors.text = pick(named, /(^|[-_])(text|foreground|fg|ink)([-_]|$)/) || '#0f172a';
+    colors.surface = (brandSurface && luminance(brandSurface) > 0.85) ? brandSurface : '#f1f5f9';
+    colors.text = (brandText && luminance(brandText) < 0.3) ? brandText : '#0f172a';
     colors.muted = '#475569';
   } else if (brandBg && luminance(brandBg) < 0.25) {
     colors.background = brandBg;
+    colors.surface = (brandSurface && luminance(brandSurface) < 0.35)
+      ? brandSurface : mixHex(brandBg, '#ffffff', 0.08);
+    if (brandText && luminance(brandText) > 0.6) colors.text = brandText;
+    if (brandMuted && luminance(brandMuted) > 0.25 && luminance(brandMuted) < 0.8) colors.muted = brandMuted;
   }
 
   // Fonts
@@ -328,7 +369,10 @@ function resolveTheme(base, signals, mode) {
     if (!fam) continue;
     const key = fam.toLowerCase();
     const spec = specByName.get(key) || (fam.replace(/ /g, '+') + ':wght@400;700');
-    weights[slot] = maxWeightFromSpec(spec);
+    const maxW = maxWeightFromSpec(spec);
+    const has400 = !/wght@/.test(spec) || /(?:^|\D)400(?:\D|$)/.test(spec);
+    // Headings use the heaviest weight; body should read at 400 (not bold).
+    weights[slot] = slot === 'heading' ? maxW : (has400 ? 400 : Math.min(maxW, 500));
     if (!seen.has(key)) { seen.add(key); googleFonts.push(spec); }
   }
 

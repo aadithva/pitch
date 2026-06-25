@@ -94,6 +94,13 @@ function visualHtml(slide, ctx) {
   if (v.type === 'image' && v.src) {
     return `<img src="${esc(v.src)}" alt="${esc(v.alt || '')}">`;
   }
+  if (v.type === 'flow' && Array.isArray(v.steps)) {
+    const items = v.steps.map((s, i) => {
+      const arrow = i < v.steps.length - 1 ? '<div class="flow-arrow">\u2192</div>' : '';
+      return `<div class="flow-step"><span class="flow-label">${spanWords(s, ctx)}</span></div>${arrow}`;
+    }).join('');
+    return `<div class="flow">${items}</div>`;
+  }
   if (v.type === 'mermaid' && v.code) {
     ctx.useMermaid = true;
     return `<pre class="mermaid">${esc(v.code)}</pre>`;

@@ -141,15 +141,32 @@
 
 /* --- Layout: diagram --- */
 .layout-diagram .diagram {
-  display: flex; align-items: center; justify-content: center;
-  height: 60%; margin-top: 0.6em;
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  min-height: 0; margin-top: 0.6em;
 }
 .layout-diagram .diagram img { max-width: 100%; max-height: 100%; }
 .layout-diagram .diagram .mermaid {
   display: flex; align-items: center; justify-content: center; width: 100%;
   font-family: var(--font-body); color: var(--muted);
 }
-.layout-diagram .diagram .mermaid svg { max-width: 100%; max-height: 54vh; height: auto; }
+.layout-diagram .diagram .mermaid svg { max-width: 100%; max-height: 52vh; height: auto; }
+
+/* --- native flow pipeline (visual.type = "flow", no Mermaid/CDN) --- */
+.diagram .flow {
+  display: flex; align-items: stretch; justify-content: center; flex-wrap: wrap;
+  gap: 0.3em 0; width: 100%;
+}
+.flow-step {
+  box-sizing: border-box;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  border-top: 3px solid var(--accent);
+  border-radius: 12px; padding: 0.8em 0.7em;
+  font-size: 0.6em; color: var(--text); line-height: 1.25;
+  width: 8em; min-height: 3em;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.flow-arrow { align-self: center; color: var(--accent); font-size: 0.75em; padding: 0 0.22em; flex: 0 0 auto; }
 
 /* --- Layout: showcase (UI is the hero — small text left, enlarged screenshot right) --- */
 .reveal .slides section.layout-showcase { padding: 5.5% 6%; }

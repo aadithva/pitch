@@ -87,7 +87,8 @@ async function main() {
   const extraJs = useMermaid
     ? `<script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+    mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose',
+      flowchart: { htmlLabels: true, useMaxWidth: true, padding: 16, nodeSpacing: 40 } });
     // Render diagrams only for the slide that is actually visible: a mermaid
     // node measured while its slide is display:none collapses to zero size.
     async function renderCurrent() {
