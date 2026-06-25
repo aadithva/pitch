@@ -11,6 +11,7 @@
 import { readFile, writeFile, mkdir, rm, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
+import { cpus } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -136,6 +137,55 @@ async function buildAudio(audioBase, slides, pad, segDir, outWav) {
   await run('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listPath, '-ar', '44100', '-ac', '2', outWav]);
 }
 
+// Render a contiguous range of frames in its own browser process. Running each
+// worker in a separate browser (not just a separate page) avoids CDP/browser-process
+// serialization — benchmarked ~4x faster than sharing one browser. Safe because
+// __dvSeek(t) is absolute and idempotent, so any frame renders independently.
+async function renderRange(deckUrl, viewport, timeline, cfg, framesDir, fps, range) {
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
+    await page.goto(deckUrl, { waitUntil: 'load' });
+    await page.waitForSelector('.reveal.ready', { timeout: 20000 });
+    await page.evaluate(() => window.Reveal.configure({ transition: 'none', backgroundTransition: 'none', controls: false, progress: false, slideNumber: false }));
+    // Wait for web fonts so text isn't captured mid-swap (FOUT) on the first frames.
+    await page.evaluate(() => (document.fonts && document.fonts.ready ? document.fonts.ready : null)).catch(() => {});
+    await page.evaluate((args) => window.__dvSetup(args.tl, args.cfg), { tl: timeline, cfg });
+    await page.waitForTimeout(200);
+
+    let last = -1;
+    for (let f = range.start; f < range.end; f++) {
+      const t = f / fps;
+      const cur = await page.evaluate((tt) => window.__dvSeek(tt), t);
+      if (cur !== last) {
+        last = cur;
+        const hasM = await page.evaluate(() => !!document.querySelector('.reveal section.present .mermaid'));
+        if (hasM) {
+          await page.waitForFunction(() => {
+            const m = document.querySelector('.reveal section.present .mermaid');
+            const svg = m && m.querySelector('svg');
+            return svg && svg.getBoundingClientRect().height > 10;
+          }, { timeout: 8000 }).catch(() => {});
+        }
+      }
+      await page.screenshot({ path: join(framesDir, `f_${String(f).padStart(6, '0')}.png`), type: 'png' });
+    }
+  } finally {
+    await browser.close();
+  }
+}
+
+// Split [0,total) into `n` contiguous chunks (keeps per-page slide continuity so
+// the mermaid-settle wait only fires on real slide changes).
+function chunkFrames(total, n) {
+  const ranges = [];
+  const size = Math.ceil(total / n);
+  for (let start = 0; start < total; start += size) {
+    ranges.push({ start, end: Math.min(start + size, total) });
+  }
+  return ranges;
+}
+
 async function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
@@ -145,6 +195,7 @@ async function main() {
       pad: { type: 'string' },
       width: { type: 'string' },
       height: { type: 'string' },
+      concurrency: { type: 'string', short: 'c' },
       captions: { type: 'string' },
       inslide: { type: 'string' }
     }
@@ -211,36 +262,19 @@ async function main() {
   const voiceover = join(segDir, 'voiceover.wav');
   const audioPromise = buildAudio(audioBase, slides, pad, segDir, voiceover);
 
-  // Capture frames.
-  const browser = await chromium.launch();
-  try {
-    const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
-    await page.goto(pathToFileURL(videoDeckPath).href, { waitUntil: 'load' });
-    await page.waitForSelector('.reveal.ready', { timeout: 20000 });
-    await page.evaluate(() => window.Reveal.configure({ transition: 'none', backgroundTransition: 'none', controls: false, progress: false, slideNumber: false }));
-    await page.evaluate((args) => window.__dvSetup(args.tl, args.cfg), { tl: timeline, cfg: { captions, inslide } });
-    await page.waitForTimeout(400);
+  // Capture frames in parallel: N independent browser processes, each owning a
+  // contiguous frame chunk (one browser per worker avoids CDP serialization).
+  const concurrency = Math.max(1, Math.min(
+    parseInt(values.concurrency || '', 10) || Math.max(2, Math.min(6, (cpus()?.length || 4) - 1)),
+    totalFrames
+  ));
+  const deckUrl = pathToFileURL(videoDeckPath).href;
+  const viewport = { width, height };
+  const cfg = { captions, inslide };
+  process.stdout.write(`render_video: capturing ${totalFrames} frames across ${concurrency} workers\u2026\n`);
 
-    let last = -1;
-    for (let f = 0; f < totalFrames; f++) {
-      const t = f / fps;
-      const cur = await page.evaluate((tt) => window.__dvSeek(tt), t);
-      if (cur !== last) {
-        last = cur;
-        const hasM = await page.evaluate(() => !!document.querySelector('.reveal section.present .mermaid'));
-        if (hasM) {
-          await page.waitForFunction(() => {
-            const m = document.querySelector('.reveal section.present .mermaid');
-            const svg = m && m.querySelector('svg');
-            return svg && svg.getBoundingClientRect().height > 10;
-          }, { timeout: 8000 }).catch(() => {});
-        }
-      }
-      await page.screenshot({ path: join(framesDir, `f_${String(f).padStart(6, '0')}.png`), type: 'png' });
-    }
-  } finally {
-    await browser.close();
-  }
+  const ranges = chunkFrames(totalFrames, concurrency);
+  await Promise.all(ranges.map((r) => renderRange(deckUrl, viewport, timeline, cfg, framesDir, fps, r)));
 
   await audioPromise;
   await rm(videoDeckPath, { force: true });
@@ -250,7 +284,9 @@ async function main() {
   await run('ffmpeg', ['-y',
     '-framerate', String(fps), '-i', join(framesDir, 'f_%06d.png'),
     '-i', voiceover,
-    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', String(fps),
+    '-c:v', 'libx264', '-preset', 'medium', '-crf', '20',
+    '-pix_fmt', 'yuv420p', '-r', String(fps),
+    '-movflags', '+faststart', '-video_track_timescale', '90000',
     '-c:a', 'aac', '-b:a', '160k', '-shortest', outPath]);
 
   process.stdout.write(`\u2713 video written: ${outPath}\n`);

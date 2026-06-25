@@ -21,8 +21,15 @@ block), captured frame-by-frame.
 ```bash
 python3 scripts/tts.py slides.json --out build/<name> [--voice en-US-AriaNeural]
 node scripts/render_video.mjs build/<name>/deck.html build/<name> \
-  --out build/<name>/final.mp4 [--fps 12] [--pad 0.4]
+  --out build/<name>/final.mp4 [--fps 12] [--pad 0.4] [--concurrency N]
 ```
+Frames are captured **in parallel** across N independent browser processes (one per
+worker), each owning a contiguous frame chunk (defaults to ~CPU-1, capped at 6).
+One browser per worker avoids Chromium's CDP/browser-process serialization — measured
+~4× faster than sharing a single browser, ~3-4× faster end-to-end than sequential.
+Safe because the `__dvSeek(t)` driver is absolute/idempotent, so any frame renders
+independently (output is byte-identical to a sequential render). Web fonts are awaited
+(`document.fonts.ready`) before the first frame to avoid FOUT.
 
 ## Stage 3 — TTS + word timestamps (`scripts/tts.py`)
 Pluggable provider; output contract per slide: `sNNN.mp3` + `sNNN.words.json`
@@ -46,7 +53,9 @@ Priority for timestamps: TTS-native (edge-tts/ElevenLabs) → faster-whisper →
    `__dvSeek(t)` (navigates to the active slide, highlights the active word) and
    screenshots. Waits for Mermaid SVGs when a diagram slide appears.
 4. ffmpeg concatenates per-slide audio (mp3 + silence pad / `anullsrc` for silent
-   slides) into `voiceover.wav`, then muxes `frames + voiceover → final.mp4`.
+   slides) into `voiceover.wav`, then muxes `frames + voiceover → final.mp4`
+   (`libx264 -preset medium -crf 20 -movflags +faststart` → smaller, higher-quality,
+   web-streamable MP4; AAC 160k audio).
    Deterministic and reproducible; transitions are disabled so every frame shows a
    clean highlight state.
 

@@ -1,6 +1,6 @@
 {
   "name": "pitch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Agent skill: turn a project into a self-explanatory, brand-styled deck and (later) a narrated, word-highlighted video.",
@@ -20,6 +20,7 @@
     "demo:video": "node scripts/render_video.mjs build/demo/deck.html build/demo --out build/demo/final.mp4 --fps 12"
   },
   "dependencies": {
+    "culori": "^4.0.2",
     "node-vibrant": "^4.0.3",
     "reveal.js": "^5.2.1"
   },

@@ -39,7 +39,7 @@ if [ -d "$DEST/commands" ]; then
 fi
 
 if command -v npm >/dev/null 2>&1; then
-  say "Installing Node dependencies (reveal.js, node-vibrant, playwright) …"
+  say "Installing Node dependencies (reveal.js, node-vibrant, culori, playwright) …"
   ( cd "$DEST" && npm install --silent && npx --yes playwright install chromium )
   ok "Node dependencies installed"
 else
