@@ -13,3 +13,12 @@ demos/**/*.png
 demos/**/*-deck.html
 # generated skill bundle
 site/*.tar.gz
+
+# secrets — never commit
+.env
+.env.*
+*.token
+.secrets/
+.vibehub*
+site/*.zip
+site/_deploy/

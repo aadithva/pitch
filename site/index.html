@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>deck-to-video — turn any project into a narrated explainer</title>
-<meta name="description" content="An Agent Skill that turns any project into a brand-styled deck and an AI-narrated video — with live UI demos." />
+<title>Pitch — turn any project into a narrated explainer</title>
+<meta name="description" content="Pitch is an Agent Skill that turns any project into a brand-styled deck and an AI-narrated video — with a live demo of the actual UI. Pick a variant from the slash menu." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
@@ -23,34 +23,34 @@
   .wrap{max-width:920px;margin:0 auto;padding:0 24px}
   .kicker{font-family:var(--mono);font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--primary);display:inline-flex;align-items:center;gap:.6em}
   .kicker::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--accent)}
-  h1{font-family:var(--head);font-weight:700;font-size:clamp(40px,8vw,76px);letter-spacing:-.03em;line-height:1.02;margin:.35em 0 .2em}
+  h1{font-family:var(--head);font-weight:700;font-size:clamp(48px,9vw,92px);letter-spacing:-.03em;line-height:1.0;margin:.3em 0 .2em}
   h2{font-family:var(--head);font-weight:700;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;margin:0 0 .5em}
   p.lead{font-size:clamp(17px,2.4vw,21px);color:var(--muted);max-width:30em;margin:0}
   header{padding:96px 0 40px}
   section{padding:46px 0;border-top:1px solid var(--line)}
+  .muted{color:var(--muted)} .maxw{max-width:34em}
   .cmd{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);
-      border-radius:14px;padding:16px 18px;margin:30px 0 10px;max-width:660px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+      border-radius:14px;padding:16px 18px;margin:26px 0 10px;max-width:640px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
   .cmd code{font-family:var(--mono);font-size:15px;color:var(--text);overflow-x:auto;white-space:nowrap;flex:1}
   .cmd code .tok{color:var(--primary)}
   .copy{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;
       background:var(--primary);color:#04161a;border:0;border-radius:8px;padding:9px 12px;font-weight:700;flex:0 0 auto}
   .copy:active{transform:translateY(1px)}
   .hint{font-family:var(--mono);font-size:12px;color:var(--muted)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:26px}
+  .accent{color:var(--accent)}
+  .variants{margin-top:24px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .variants .row{display:flex;gap:16px;align-items:baseline;padding:14px 18px;border-top:1px solid var(--line)}
+  .variants .row:first-child{border-top:0}
+  .variants .c{font-family:var(--mono);color:var(--primary);font-size:15px;flex:0 0 168px}
+  .variants .d{color:var(--muted);font-size:15px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px}
   .card{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--primary);border-radius:16px;padding:18px}
   .card .n{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.1em}
   .card h3{font-family:var(--head);font-size:18px;margin:.4em 0 .3em}
   .card p{margin:0;color:var(--muted);font-size:14px}
   ul.req{list-style:none;padding:0;margin:18px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
-  ul.req li{font-size:14px;color:var(--muted)}
-  ul.req b{color:var(--text);font-weight:600}
-  .demos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:24px}
-  .demo{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;transition:border-color .2s}
-  .demo:hover{border-color:var(--primary)}
-  .demo .t{font-family:var(--head);font-weight:700;font-size:18px}
-  .demo .d{color:var(--muted);font-size:14px;margin-top:4px}
+  ul.req li{font-size:14px;color:var(--muted)} ul.req b{color:var(--text);font-weight:600}
   footer{padding:50px 0 70px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:.04em;border-top:1px solid var(--line)}
-  .accent{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -58,29 +58,41 @@
 
   <header>
     <span class="kicker">Agent Skill</span>
-    <h1>deck&#8209;to&#8209;video</h1>
-    <p class="lead">Turn any project into a brand&#8209;styled deck and an AI&#8209;narrated explainer video — with a live demo of the actual UI. One skill, run by your agent.</p>
+    <h1>Pitch</h1>
+    <p class="lead">Turn any project into a brand&#8209;styled deck and an AI&#8209;narrated explainer video — with a live demo of the actual UI. Pick a variant from the slash menu.</p>
   </header>
 
   <section id="install">
     <h2>Install</h2>
-    <p style="color:var(--muted);margin:0;max-width:34em">Run this in your terminal. It drops the skill into your skills directory and installs its dependencies.</p>
+    <p class="muted maxw">Run this once in your terminal. It adds the skill and its slash commands.</p>
     <div class="cmd">
-      <code id="cmd"><span class="tok">curl</span> -fsSL https://vibehub.microsoft.com/app/deck-to-video/install.sh | <span class="tok">bash</span></code>
+      <code id="cmd"><span class="tok">curl</span> -fsSL https://vibehub.microsoft.com/app/pitch/install.txt | <span class="tok">bash</span></code>
       <button class="copy" onclick="copyCmd(this)">Copy</button>
     </div>
-    <p class="hint">Installs to <span class="accent">~/.claude/skills/deck-to-video</span> &nbsp;·&nbsp; override with <span class="accent">SKILLS_DIR=…</span></p>
+    <p class="hint">Skill → <span class="accent">~/.claude/skills/pitch</span> &nbsp;·&nbsp; commands → <span class="accent">~/.claude/commands</span></p>
+  </section>
+
+  <section id="variants">
+    <h2>Pick a variant</h2>
+    <p class="muted maxw">Open your agent in any project and run one of these:</p>
+    <div class="variants">
+      <div class="row"><span class="c">/pitch</span><span class="d">Full — live demo + deck + narrated video</span></div>
+      <div class="row"><span class="c">/pitch-deck</span><span class="d">Deck only — branded slides (HTML + PDF)</span></div>
+      <div class="row"><span class="c">/pitch-video</span><span class="d">Deck + AI voiceover → narrated MP4</span></div>
+      <div class="row"><span class="c">/pitch-script</span><span class="d">Script only — the spoken narration / talk-track</span></div>
+      <div class="row"><span class="c">/pitch-demo</span><span class="d">Live UI demo — run the app, capture screens + a recording</span></div>
+    </div>
   </section>
 
   <section id="how">
-    <h2>What it does</h2>
-    <p style="color:var(--muted);margin:0;max-width:34em">Point your agent at a project and ask for a deck or video. The skill runs five layers:</p>
+    <h2>How it works</h2>
+    <p class="muted maxw">Five layers, run by your agent:</p>
     <div class="grid">
       <div class="card"><div class="n">01</div><h3>Extract style</h3><p>Pulls the project's real colors, fonts, and logo into an on&#8209;brand theme.</p></div>
-      <div class="card"><div class="n">02</div><h3>Generate deck</h3><p>Writes a self&#8209;explanatory deck and renders it as themed reveal.js.</p></div>
-      <div class="card"><div class="n">03</div><h3>Narrate</h3><p>Writes &amp; speaks a script with AI voice (edge&#8209;tts), free and local.</p></div>
-      <div class="card"><div class="n">04</div><h3>Render video</h3><p>Captures the deck deterministically and muxes the voiceover into an MP4.</p></div>
-      <div class="card"><div class="n">05</div><h3>Live demo</h3><p>Runs the actual app and records the real UI &amp; user flow to showcase.</p></div>
+      <div class="card"><div class="n">02</div><h3>Live demo</h3><p>Runs the actual app and records the real UI &amp; user flow.</p></div>
+      <div class="card"><div class="n">03</div><h3>Generate deck</h3><p>Writes a self&#8209;explanatory deck and renders it as themed reveal.js.</p></div>
+      <div class="card"><div class="n">04</div><h3>Narrate</h3><p>Writes &amp; speaks a script with AI voice (edge&#8209;tts), free and local.</p></div>
+      <div class="card"><div class="n">05</div><h3>Render video</h3><p>Captures the deck deterministically and muxes the voiceover into an MP4.</p></div>
     </div>
   </section>
 
@@ -94,26 +106,15 @@
     </ul>
   </section>
 
-  <section id="demos">
-    <h2>Built with it</h2>
-    <p style="color:var(--muted);margin:0;max-width:34em">Real vibe&#8209;coded projects, explained by the skill.</p>
-    <div class="demos">
-      <a class="demo" href="./demos/designshift/final-video/DesignShift-explainer.mp4"><div class="t">DesignShift</div><div class="d">AI&#8209;led design lifecycle · HatchLab idea graph</div></a>
-      <a class="demo" href="./demos/flowsense/final-video/FlowSense-explainer.mp4"><div class="t">FlowSense</div><div class="d">AI interaction&#8209;quality scoring · Next.js + Azure</div></a>
-    </div>
-  </section>
-
-  <footer>
-    deck-to-video · an Agent Skill · made for designers &amp; vibecoders
-  </footer>
+  <footer>Pitch · an Agent Skill · made for designers &amp; vibecoders</footer>
 
 </div>
 <script>
   function copyCmd(btn){
-    var text = document.getElementById('cmd').innerText;
-    navigator.clipboard.writeText(text).then(function(){
-      var old = btn.textContent; btn.textContent = 'Copied';
-      setTimeout(function(){ btn.textContent = old; }, 1400);
+    var t = document.getElementById('cmd').innerText;
+    navigator.clipboard.writeText(t).then(function(){
+      var o = btn.textContent; btn.textContent='Copied';
+      setTimeout(function(){ btn.textContent=o; }, 1400);
     });
   }
 </script>

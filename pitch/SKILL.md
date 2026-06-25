@@ -1,5 +1,5 @@
 ---
-name: deck-to-video
+name: pitch
 description: >-
   Use this skill whenever the user wants to turn a project, codebase, design, or
   brief into a presentation deck and/or a narrated explainer video. Triggers on:
@@ -12,11 +12,27 @@ description: >-
 license: MIT
 ---
 
-# deck-to-video
+# Pitch
 
-Turn a project into a **self-explanatory, brand-styled deck** and (progressively)
-a **narrated, word-highlighted video**. Built for designers and "vibecoders" who
-want a polished explainer without a timeline editor.
+Turn a project into a **self-explanatory, brand-styled deck** and an **AI-narrated
+video** — with a **live demo of the real UI**. Built for designers and
+"vibecoders" who want a polished explainer without a timeline editor.
+
+## Variants (slash commands)
+Users pick a variant from the slash menu (`commands/` ship with the skill, installed
+to `~/.claude/commands/`):
+
+| Command | Output |
+|---------|--------|
+| `/pitch` | **Full** — live demo + deck + narrated video |
+| `/pitch-deck` | **Deck only** (HTML + PDF) |
+| `/pitch-script` | **Script only** — the spoken narration / talk-track |
+| `/pitch-video` | **Deck + video** — narrated MP4 |
+| `/pitch-demo` | **Live UI demo** — screenshots + recording of the running app |
+
+Each command runs the stages below in the relevant mode; the base skill is the
+same engine.
+
 
 ## What it produces
 - `deck.html` — a single self-contained reveal.js deck, styled in the project's brand.

@@ -3,7 +3,7 @@
 # for hosting (VibeHub / any static host). Excludes node_modules, build, .venv.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-NAME="deck-to-video"
+NAME="pitch"
 OUT="$ROOT/site/$NAME.tar.gz"
 
 if [ ! -d "$ROOT/$NAME" ]; then
