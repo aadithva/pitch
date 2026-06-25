@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # install.sh — install the Pitch Agent Skill + its slash commands.
 #
-#   curl -fsSL https://vibehub.microsoft.com/app/pitch/install.sh | bash
+#   curl -fsSL https://github.com/aadithva/pitch/releases/latest/download/install.sh | bash
 #
 # Overrides (env vars):
 #   SKILLS_DIR     where the skill goes     (default: ~/.claude/skills)
@@ -10,7 +10,7 @@
 set -euo pipefail
 
 NAME="pitch"
-BASE_URL="${PITCH_BASE_URL:-https://vibehub.microsoft.com/app/pitch}"
+BASE_URL="${PITCH_BASE_URL:-https://github.com/aadithva/pitch/releases/latest/download}"
 SKILLS_DIR="${SKILLS_DIR:-$HOME/.claude/skills}"
 COMMANDS_DIR="${COMMANDS_DIR:-$HOME/.claude/commands}"
 DEST="$SKILLS_DIR/$NAME"
