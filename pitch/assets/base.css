@@ -25,10 +25,8 @@
 }
 
 /* Per-slide index, mono, top-right (hidden on the cover). */
-.reveal .slides { counter-reset: slidenum; }
-.reveal .slides > section { counter-increment: slidenum; }
 .reveal .slides > section::after {
-  content: counter(slidenum, decimal-leading-zero);
+  content: attr(data-index);
   position: absolute; top: 6.5%; right: 8%;
   font-family: var(--font-mono); font-size: 0.58em; letter-spacing: 0.12em;
   color: var(--muted); opacity: 0.55;

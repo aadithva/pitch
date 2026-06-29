@@ -1,0 +1,73 @@
+{
+  "id": "minimalist",
+  "name": "Minimalist",
+  "mode": "light",
+  "tagline": "Swiss whitespace, hairline rules, one decisive accent.",
+  "recommendWhen": "Enterprise, fintech, product, consulting, or research — when the content is the argument.",
+  "palette": {
+    "background": "#F7F4EF",
+    "surface": "#ECE8E1",
+    "text": "#1C1B18",
+    "muted": "#6F6A62",
+    "primary": "#1C1B18",
+    "secondary": "#8A857C",
+    "accent": "#C8281E",
+    "highlight": "#C8281E"
+  },
+  "fonts": {
+    "heading": "'Space Grotesk', 'Segoe UI', system-ui, sans-serif",
+    "body": "'Inter', system-ui, sans-serif",
+    "mono": "'Space Mono', ui-monospace, monospace"
+  },
+  "fontWeights": {
+    "heading": 700,
+    "body": 400
+  },
+  "googleFonts": [
+    "Space+Grotesk:wght@500;700",
+    "Inter:wght@400;500",
+    "Space+Mono"
+  ],
+  "backgrounds": [
+    {
+      "id": "grid",
+      "kind": "pattern",
+      "opacity": 0.5,
+      "use": [
+        "divider"
+      ]
+    }
+  ],
+  "motifs": [
+    {
+      "id": "mn-rule",
+      "role": "rule",
+      "placement": "top-left"
+    },
+    {
+      "id": "mn-dot",
+      "role": "accent",
+      "placement": "top-right"
+    }
+  ],
+  "elements": [
+    {
+      "src": "elements/malevich.jpg",
+      "alt": "Malevich Suprematist Composition",
+      "license": "PD-Art"
+    }
+  ],
+  "treatments": {
+    "cover": {
+      "motifs": [
+        "mn-rule"
+      ]
+    },
+    "divider": {
+      "background": "grid",
+      "motifs": [
+        "mn-dot"
+      ]
+    }
+  }
+}

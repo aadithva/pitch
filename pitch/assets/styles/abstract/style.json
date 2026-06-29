@@ -1,0 +1,90 @@
+{
+  "id": "abstract",
+  "name": "Abstract",
+  "mode": "dark",
+  "tagline": "Cosmic color fields, organic blobs, gradient mesh.",
+  "recommendWhen": "Creative, AI/ML, design, or innovation stories — depth without literal imagery.",
+  "palette": {
+    "background": "#0B0B12",
+    "surface": "#16131F",
+    "text": "#F4F1EA",
+    "muted": "#9A93A8",
+    "primary": "#5B8DEF",
+    "secondary": "#2E8B6A",
+    "accent": "#E8630A",
+    "highlight": "#F2C12E"
+  },
+  "fonts": {
+    "heading": "'Bebas Neue', Impact, sans-serif",
+    "body": "'DM Sans', system-ui, sans-serif",
+    "mono": "'Space Mono', ui-monospace, monospace"
+  },
+  "fontWeights": {
+    "heading": 400,
+    "body": 400
+  },
+  "googleFonts": [
+    "Bebas+Neue",
+    "DM+Sans:wght@400;500",
+    "Space+Mono"
+  ],
+  "backgrounds": [
+    {
+      "id": "mesh",
+      "kind": "gradient",
+      "opacity": 1,
+      "use": [
+        "cover",
+        "closing"
+      ]
+    },
+    {
+      "id": "andromeda",
+      "kind": "image",
+      "src": "backgrounds/andromeda.jpg",
+      "opacity": 0.55,
+      "use": [
+        "divider"
+      ]
+    },
+    {
+      "id": "lagoon",
+      "kind": "image",
+      "src": "backgrounds/lagoon.jpg",
+      "opacity": 0.5,
+      "use": [
+        "content"
+      ]
+    }
+  ],
+  "motifs": [
+    {
+      "id": "ab-blob",
+      "role": "accent",
+      "placement": "top-right"
+    },
+    {
+      "id": "ab-scatter",
+      "role": "accent",
+      "placement": "bottom-left"
+    }
+  ],
+  "elements": [
+    {
+      "src": "elements/cassiopeia.jpg",
+      "alt": "Cassiopeia A supernova remnant",
+      "license": "PD (NASA)"
+    }
+  ],
+  "treatments": {
+    "cover": {
+      "background": "cassiopeia",
+      "motifs": [
+        "ab-blob"
+      ]
+    },
+    "divider": {
+      "background": "andromeda"
+    }
+  }
+}

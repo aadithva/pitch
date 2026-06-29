@@ -1,0 +1,5 @@
+[
+  {"url":"https://tile.loc.gov/storage-services/service/pnp/ppmsca/55300/55335r.jpg","out":"elements/trading-card.jpg","license":"No known restrictions (LoC)","credit":"Allen & Ginter chromolithograph card (1888), Library of Congress","role":"cover-art"},
+  {"url":"https://images.metmuseum.org/CRDImages/ad/original/AW_83_2_13-001.jpg","out":"elements/medal.jpg","license":"CC0 1.0","credit":"Eccleston Medal, Washington profile (1805), The Met Open Access","role":"accent"},
+  {"url":"https://f003.backblazeb2.com/file/ambientCG-Web/media/surface-preview/Metal048A/Metal048A_SQ_Color.jpg","out":"backgrounds/gold.jpg","license":"CC0 1.0","credit":"ambientCG Metal048A (gold)","role":"divider"}
+]

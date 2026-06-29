@@ -243,14 +243,21 @@ export function renderSlide(slide, slideIndex, ctx) {
   }
 
   const id = slide.id ? ` id="${esc(slide.id)}"` : '';
-  return `      <section class="layout-${layout}" data-slide="${slideIndex}"${id}>
-    ${inner}${notesHtml(slide)}
+  let styleLayer = '';
+  if (ctx.style && ctx.style.byRole) {
+    const role = ctx.style.roleOf ? ctx.style.roleOf(slide, slideIndex, ctx.style.total) : 'content';
+    const t = ctx.style.byRole[role];
+    if (t) styleLayer = (t.bg || '') + (t.motifs || '');
+  }
+  return `      <section class="layout-${layout}" data-slide="${slideIndex}" data-index="${String(slideIndex + 1).padStart(2, '0')}"${id}>
+    ${styleLayer}${inner}${notesHtml(slide)}
   </section>`;
 }
 
 /** Render all slides; returns { html, words, useMermaid }. */
-export function renderSlides(slides) {
-  const ctx = { counter: 0, words: [], slide: 0, useMermaid: false };
+export function renderSlides(slides, style = null) {
+  if (style) style.total = slides.length;
+  const ctx = { counter: 0, words: [], slide: 0, useMermaid: false, style };
   const html = slides.map((s, i) => renderSlide(s, i, ctx)).join('\n');
   return { html, words: ctx.words, useMermaid: ctx.useMermaid };
 }

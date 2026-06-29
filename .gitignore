@@ -22,3 +22,5 @@ site/*.tar.gz
 .vibehub*
 site/*.zip
 site/_deploy/
+.playwright-mcp/
+site/app/

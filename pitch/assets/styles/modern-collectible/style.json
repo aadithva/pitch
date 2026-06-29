@@ -1,0 +1,92 @@
+{
+  "id": "modern-collectible",
+  "name": "Modern Collectible",
+  "mode": "dark",
+  "tagline": "Trading-card frames, foil shimmer, medallions and rarity.",
+  "recommendWhen": "Awards, rankings, milestones, limited drops — scarcity and prestige.",
+  "palette": {
+    "background": "#0A0E1A",
+    "surface": "#141A2B",
+    "text": "#F3F0E8",
+    "muted": "#9AA0B0",
+    "primary": "#C8973F",
+    "secondary": "#B8C4CF",
+    "accent": "#00E5FF",
+    "highlight": "#FFE566"
+  },
+  "fonts": {
+    "heading": "'Cinzel', Georgia, serif",
+    "body": "'DM Sans', system-ui, sans-serif",
+    "mono": "'Space Mono', ui-monospace, monospace"
+  },
+  "fontWeights": {
+    "heading": 700,
+    "body": 400
+  },
+  "googleFonts": [
+    "Cinzel:wght@500;700",
+    "DM+Sans:wght@400;500",
+    "Space+Mono"
+  ],
+  "backgrounds": [
+    {
+      "id": "foil",
+      "kind": "gradient",
+      "opacity": 0.3,
+      "use": [
+        "closing"
+      ]
+    },
+    {
+      "id": "gold",
+      "kind": "image",
+      "src": "backgrounds/gold.jpg",
+      "opacity": 0.4,
+      "use": [
+        "cover",
+        "divider"
+      ]
+    }
+  ],
+  "motifs": [
+    {
+      "id": "mc-medallion",
+      "role": "accent",
+      "placement": "top-right"
+    },
+    {
+      "id": "mc-gem",
+      "role": "accent",
+      "placement": "bottom-right"
+    }
+  ],
+  "elements": [
+    {
+      "src": "elements/trading-card.jpg",
+      "alt": "Allen & Ginter card (1888)",
+      "license": "PD (LoC)"
+    },
+    {
+      "src": "elements/medal.jpg",
+      "alt": "Washington medal (1805)",
+      "license": "CC0"
+    }
+  ],
+  "treatments": {
+    "cover": {
+      "background": "gold",
+      "motifs": [
+        "mc-medallion"
+      ]
+    },
+    "divider": {
+      "background": "gold"
+    },
+    "closing": {
+      "background": "foil",
+      "motifs": [
+        "mc-gem"
+      ]
+    }
+  }
+}

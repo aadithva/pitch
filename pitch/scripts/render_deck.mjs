@@ -9,12 +9,13 @@
 // with reveal.js, theme, and layout CSS inlined.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { renderSlides } from './lib/deck.mjs';
 import { loadTheme, compileThemeCss, googleFontsLinks, mergeTheme, loadDefaultTheme } from './lib/theme.mjs';
+import { loadStyle, applyStyleToTheme } from './lib/styles.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SKILL_ROOT = join(__dirname, '..');
@@ -47,10 +48,63 @@ async function resolveTheme(themePath) {
   return { css, fonts };
 }
 
+// --- visual style packs --------------------------------------------------
+const MIME = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+function inlineImg(p) {
+  try {
+    const ext = (p.match(/\.[^.]+$/) || [''])[0].toLowerCase();
+    return `data:${MIME[ext] || 'image/jpeg'};base64,${readFileSync(p).toString('base64')}`;
+  } catch { return null; }
+}
+function roleOf(slide, i, total) {
+  if (slide.layout === 'divider' || slide.type === 'section') return 'divider';
+  if (i === 0 || slide.type === 'cover') return 'cover';
+  if (i === total - 1 && (slide.type === 'cta' || slide.layout === 'closing')) return 'closing';
+  return 'content';
+}
+function buildStyleCtx(pack, dir, total) {
+  const bgById = {};
+  for (const b of (pack.backgrounds || [])) bgById[b.id] = b;
+  const elemSrc = {};
+  for (const e of (pack.elements || [])) elemSrc[e.src.split('/').pop().replace(/\.[^.]+$/, '')] = e.src;
+  function resolveBg(ref, role) {
+    if (!ref) return '';
+    let kind = null, src = null, opacity = null;
+    if (bgById[ref]) { ({ kind, src, opacity } = bgById[ref]); }
+    else if (elemSrc[ref]) { kind = 'image'; src = elemSrc[ref]; }
+    else return '';
+    if ((kind === 'image' || kind === 'texture') && src) {
+      const uri = inlineImg(join(dir, src));
+      return uri ? `<div class="slide-bg scrim"><img src="${uri}" alt=""></div>` : '';
+    }
+    // Patterns/gradients get a soft scrim on cover/closing so titles stay legible.
+    const scrim = (role === 'cover' || role === 'closing') ? ' scrim-soft' : '';
+    return `<div class="slide-bg bgp-${ref}${scrim}" style="opacity:${opacity != null ? opacity : 1}"></div>`;
+  }
+  function resolveMotifs(ids) {
+    return (ids || []).map((id) => {
+      const m = (pack.motifs || []).find((x) => x.id === id) || { id };
+      return `<svg class="motif m-${m.placement || 'top-right'}" aria-hidden="true"><use href="#${id}"/></svg>`;
+    }).join('');
+  }
+  function treat(role) {
+    const t = (pack.treatments && pack.treatments[role]) || {};
+    let bgRef = t.background;
+    if (!bgRef && (role === 'content' || role === 'closing')) {
+      const b = (pack.backgrounds || []).find((x) => (x.use || []).includes(role));
+      if (b) bgRef = b.id;
+    }
+    return { bg: resolveBg(bgRef, role), motifs: resolveMotifs(t.motifs) };
+  }
+  const byRole = {};
+  for (const r of ['cover', 'content', 'closing', 'divider']) byRole[r] = treat(r);
+  return { byRole, total, roleOf };
+}
+
 async function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
-    options: { out: { type: 'string', short: 'o' } }
+    options: { out: { type: 'string', short: 'o' }, style: { type: 'string' } }
   });
 
   const slidesPath = positionals[0];
@@ -70,8 +124,17 @@ async function main() {
   const outPath = resolve(values.out || 'deck.html');
   const title = (spec.title) || (slides[0] && slides[0].title) || 'Presentation';
 
+  // Optional visual style pack (palette + fonts + motifs + backgrounds).
+  let stylePack = null, styleCtx = null, styleRuntimeCss = '';
+  if (values.style) {
+    try { stylePack = await loadStyle(values.style); }
+    catch (e) { fail(e.message); }
+    styleCtx = buildStyleCtx(stylePack.pack, stylePack.dir, slides.length);
+    styleRuntimeCss = await readFile(join(ASSETS, 'styles.css'), 'utf8');
+  }
+
   // Render slides + collect the word manifest.
-  const { html: slidesHtml, words, useMermaid } = renderSlides(slides);
+  const { html: slidesHtml, words, useMermaid } = renderSlides(slides, styleCtx);
 
   // Gather inlined assets.
   const [resetCss, revealCss, baseCss, highlightCss, revealJs] = await Promise.all([
@@ -81,7 +144,15 @@ async function main() {
     readFile(join(ASSETS, 'highlight.css'), 'utf8'),
     readFile(join(REVEAL, 'reveal.js'), 'utf8')
   ]);
-  const theme = await resolveTheme(themePath);
+  // Theme: merge the style pack's palette + fonts when a style is active.
+  let theme;
+  if (stylePack) {
+    const baseTheme = themePath && themePath.endsWith('.json') ? await loadTheme(themePath) : await loadTheme(null);
+    const merged = applyStyleToTheme(baseTheme, stylePack.pack);
+    theme = { css: compileThemeCss(merged), fonts: googleFontsLinks(merged) };
+  } else {
+    theme = await resolveTheme(themePath);
+  }
   const template = await readFile(join(ASSETS, 'deck_template.html'), 'utf8');
 
   const extraJs = useMermaid
@@ -106,17 +177,22 @@ async function main() {
   </script>`
     : '';
 
-  const out = template
+  let out = template
     .replaceAll('{{TITLE}}', title)
     .replace('{{GOOGLE_FONTS}}', theme.fonts)
     .replace('{{REVEAL_CSS}}', `${resetCss}\n${revealCss}`)
     .replace('{{THEME_CSS}}', theme.css)
     .replace('{{BASE_CSS}}', baseCss)
-    .replace('{{HIGHLIGHT_CSS}}', highlightCss)
+    .replace('{{HIGHLIGHT_CSS}}', `${highlightCss}${stylePack ? `\n/* === styles.css (visual style runtime) === */\n${styleRuntimeCss}\n${stylePack.css || ''}` : ''}`)
     .replace('{{SLIDES}}', slidesHtml)
     .replace('{{REVEAL_JS}}', revealJs)
     .replace('{{NARRATION_JSON}}', 'null')
     .replace('{{EXTRA_JS}}', extraJs);
+
+  // Inject the motif sprite (outside .slides so reveal doesn't treat it as a slide).
+  if (stylePack && stylePack.motifsSvg) {
+    out = out.replace('<div class="reveal">', `${stylePack.motifsSvg}\n  <div class="reveal">`);
+  }
 
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, out, 'utf8');
@@ -126,7 +202,7 @@ async function main() {
 
   process.stdout.write(
     `\u2713 deck written: ${outPath}\n` +
-    `  slides: ${slides.length}, words: ${words.length}\n` +
+    `  slides: ${slides.length}, words: ${words.length}${stylePack ? `, style: ${stylePack.id}` : ''}\n` +
     `  manifest: ${wordsPath}\n`
   );
 }

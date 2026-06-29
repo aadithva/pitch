@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pitch style pack",
+  "description": "A curated, offline visual style for decks. Ships under assets/styles/<id>/. Merges a palette + font pairing into the theme and exposes motifs/backgrounds/elements the renderer composes (cover art, dividers, subtle backgrounds, accents).",
+  "type": "object",
+  "required": ["id", "name", "palette", "fonts"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Folder name, e.g. 'pop-art'." },
+    "name": { "type": "string", "description": "Display name, e.g. 'Pop Art'." },
+    "tagline": { "type": "string", "description": "One-line description of the look." },
+    "recommendWhen": { "type": "string", "description": "When the recommender should suggest this style." },
+    "mode": { "type": "string", "enum": ["dark", "light"], "default": "dark" },
+    "palette": {
+      "type": "object",
+      "description": "Theme color tokens this style applies (same shape as theme.json colors).",
+      "properties": {
+        "background": { "type": "string" },
+        "surface": { "type": "string" },
+        "text": { "type": "string" },
+        "muted": { "type": "string" },
+        "primary": { "type": "string" },
+        "secondary": { "type": "string" },
+        "accent": { "type": "string" },
+        "highlight": { "type": "string" }
+      }
+    },
+    "fonts": {
+      "type": "object",
+      "properties": {
+        "heading": { "type": "string" },
+        "body": { "type": "string" },
+        "mono": { "type": "string" }
+      }
+    },
+    "googleFonts": { "type": "array", "items": { "type": "string" }, "description": "Google Fonts family specs, e.g. 'Anton:wght@400'." },
+    "fontWeights": {
+      "type": "object",
+      "properties": { "heading": { "type": "number" }, "body": { "type": "number" } }
+    },
+    "backgrounds": {
+      "type": "array",
+      "description": "Background treatments the renderer may apply (subtle, readability-safe).",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string", "enum": ["pattern", "texture", "gradient", "image"], "description": "pattern/gradient = CSS in style.css; texture/image = raster file in backgrounds/." },
+          "src": { "type": "string", "description": "File under backgrounds/ for kind=texture|image." },
+          "opacity": { "type": "number", "default": 0.12 },
+          "use": { "type": "array", "items": { "type": "string", "enum": ["cover", "divider", "content", "closing"] } }
+        }
+      }
+    },
+    "motifs": {
+      "type": "array",
+      "description": "Authored vector motifs (in motifs.svg as <symbol id>) the renderer can place as accents.",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string", "description": "Matches a <symbol id> in motifs.svg." },
+          "role": { "type": "string", "enum": ["corner", "frame", "divider", "accent", "burst", "rule", "stamp"], "default": "accent" },
+          "placement": { "type": "string", "enum": ["top-left", "top-right", "bottom-left", "bottom-right", "center", "full"], "default": "top-right" }
+        }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "description": "Cropped/upscaled PD/CC0 raster motifs under elements/ (used in cover/divider art).",
+      "items": {
+        "type": "object",
+        "required": ["src"],
+        "properties": {
+          "src": { "type": "string" },
+          "alt": { "type": "string" },
+          "license": { "type": "string", "description": "PD or CC0 + source (also recorded in LICENSES.md)." }
+        }
+      }
+    },
+    "treatments": {
+      "type": "object",
+      "description": "Per-layout defaults: which background/motifs to apply on cover, dividers, content, closing.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "background": { "type": "string" },
+          "motifs": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

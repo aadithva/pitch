@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<defs>
+  <symbol id="ab-blob" viewBox="0 0 100 100"><path d="M 91.84 50 Q 91.84 50 86.13 65.21 Q 80.42 80.42 65.21 82.98 Q 50 85.54 36.67 81.1 Q 23.34 76.66 16.15 63.33 Q 8.95 50 14.59 35.11 Q 20.23 20.23 35.11 17.65 Q 50 15.08 67.1 15.44 Q 84.2 15.8 88.02 32.9 Z" fill="currentColor"/></symbol>
+  <symbol id="ab-blob2" viewBox="0 0 100 100"><path d="M 82.57 50 Q 82.57 50 81.47 69.04 Q 80.37 88.08 59.97 91.89 Q 39.57 95.7 25.1 82.33 Q 10.64 68.96 11.55 50.44 Q 12.46 31.92 26.74 21.28 Q 41.02 10.64 58.25 14.34 Q 75.48 18.04 79.03 34.02 Z" fill="currentColor"/></symbol>
+  <symbol id="ab-wave" viewBox="0 0 120 40"><path d="M0 20 Q15 2 30 20 T60 20 T90 20 T120 20" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+  <symbol id="ab-scatter" viewBox="0 0 100 100"><g fill="currentColor"><circle cx="20" cy="24" r="8"/><rect x="60" y="14" width="16" height="16" rx="3"/><path d="M44 70 l12 0 -6 -10 Z"/><circle cx="78" cy="74" r="6" fill="none" stroke="currentColor" stroke-width="3"/></g></symbol>
+</defs>
+</svg>

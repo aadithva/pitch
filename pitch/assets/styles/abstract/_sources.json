@@ -1,0 +1,5 @@
+[
+  {"url":"https://images-assets.nasa.gov/image/PIA03519/PIA03519~orig.jpg","out":"elements/cassiopeia.jpg","license":"Public Domain (NASA)","credit":"NASA/JPL-Caltech/STScI/CXC/SAO, Cassiopeia A","role":"cover-art"},
+  {"url":"https://images-assets.nasa.gov/image/PIA15416/PIA15416~orig.jpg","out":"backgrounds/andromeda.jpg","license":"Public Domain (NASA)","credit":"NASA/JPL-Caltech, Andromeda (GALEX UV)","role":"divider"},
+  {"url":"https://images-assets.nasa.gov/image/PIA13453/PIA13453~orig.jpg","out":"backgrounds/lagoon.jpg","license":"Public Domain (NASA)","credit":"NASA/JPL-Caltech/UCLA, Lagoon Nebula","role":"divider"}
+]

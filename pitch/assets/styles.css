@@ -1,0 +1,72 @@
+/* styles.css — visual-style runtime. Inlined only when a style pack is active.
+   Adds per-slide background imagery/patterns + accent motifs, readability-first.
+   Everything is tinted from the active palette (theme vars), so one ruleset serves
+   all six styles. */
+
+.reveal .slides section { position: relative; }
+
+/* Background layer sits behind slide content. */
+.slide-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.slide-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Legibility scrim over photographic backgrounds — auto-tints to the palette base
+   so light styles get a light wash and dark styles a dark wash. */
+.slide-bg.scrim::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg) 72%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 90%, transparent) 100%);
+}
+.slide-bg.scrim-strong::after {
+  content: ''; position: absolute; inset: 0;
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+}
+
+/* Keep all real slide content above the background layer. */
+.reveal .slides section > *:not(.slide-bg) { position: relative; z-index: 1; }
+
+/* --- accent motifs (tinted, low-key) --- */
+.motif { position: absolute; z-index: 0; color: var(--accent); opacity: 0.16; pointer-events: none; }
+.motif > svg, .motif use { width: 100%; height: 100%; }
+.motif.m-top-right    { top: 5%;  right: 5%;  width: 15vw; height: 15vw; }
+.motif.m-top-left     { top: 5%;  left: 5%;   width: 12vw; height: 12vw; }
+.motif.m-bottom-right { bottom: 6%; right: 6%; width: 13vw; height: 13vw; }
+.motif.m-bottom-left  { bottom: 6%; left: 6%;  width: 13vw; height: 13vw; }
+.motif.m-center       { top: 50%; left: 50%; transform: translate(-50%,-50%); width: 64vw; height: 64vw; opacity: 0.05; }
+.layout-title .motif  { opacity: 0.24; }
+.layout-closing .motif{ opacity: 0.2; }
+
+/* --- background patterns (CSS, tinted by theme vars) --- */
+.bgp-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--text) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--text) 8%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+.bgp-benday {
+  background-image: radial-gradient(color-mix(in srgb, var(--accent) 55%, transparent) 24%, transparent 26%);
+  background-size: 20px 20px;
+}
+.bgp-paper {
+  background-image: radial-gradient(color-mix(in srgb, var(--muted) 12%, transparent) 1px, transparent 1.4px);
+  background-size: 7px 7px;
+}
+.bgp-seigaiha {
+  --c: color-mix(in srgb, var(--primary) 26%, transparent);
+  background-image:
+    radial-gradient(circle at 0 100%,    transparent 9px, var(--c) 10px 11px, transparent 12px),
+    radial-gradient(circle at 20px 100%, transparent 9px, var(--c) 10px 11px, transparent 12px),
+    radial-gradient(circle at 10px 100%, transparent 4px, var(--c) 5px 6px, transparent 7px);
+  background-size: 20px 20px;
+}
+.bgp-mesh {
+  background:
+    radial-gradient(42% 52% at 18% 22%, color-mix(in srgb, var(--primary) 48%, transparent), transparent 70%),
+    radial-gradient(46% 56% at 84% 26%, color-mix(in srgb, var(--accent) 42%, transparent), transparent 70%),
+    radial-gradient(52% 62% at 62% 92%, color-mix(in srgb, var(--secondary) 42%, transparent), transparent 70%);
+}
+.bgp-foil {
+  background: conic-gradient(from 0deg at 50% 50%,
+    #ff00cc, #6600ff, #00f0ff, #00ff99, #ffe566, #ff9900, #ff00cc);
+  mix-blend-mode: screen;
+}

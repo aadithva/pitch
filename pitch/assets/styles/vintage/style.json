@@ -1,0 +1,91 @@
+{
+  "id": "vintage",
+  "name": "Vintage",
+  "mode": "light",
+  "tagline": "Aged paper, deco borders, letterpress and sunbursts.",
+  "recommendWhen": "Heritage, craft, editorial, travel — warmth and provenance.",
+  "palette": {
+    "background": "#F5E6C0",
+    "surface": "#E9D6AE",
+    "text": "#2B2118",
+    "muted": "#7B4E2D",
+    "primary": "#1F3A57",
+    "secondary": "#2E6F72",
+    "accent": "#B54430",
+    "highlight": "#C89A1A"
+  },
+  "fonts": {
+    "heading": "'Abril Fatface', Georgia, serif",
+    "body": "'Libre Baskerville', Georgia, serif",
+    "mono": "'Space Mono', ui-monospace, monospace"
+  },
+  "fontWeights": {
+    "heading": 400,
+    "body": 400
+  },
+  "googleFonts": [
+    "Abril+Fatface",
+    "Libre+Baskerville:wght@400;700",
+    "Space+Mono"
+  ],
+  "backgrounds": [
+    {
+      "id": "paper",
+      "kind": "pattern",
+      "opacity": 1,
+      "use": [
+        "cover",
+        "content",
+        "divider",
+        "closing"
+      ]
+    },
+    {
+      "id": "grand-canyon",
+      "kind": "image",
+      "src": "backgrounds/grand-canyon.jpg",
+      "opacity": 0.85,
+      "use": [
+        "divider"
+      ]
+    }
+  ],
+  "motifs": [
+    {
+      "id": "vn-sunburst",
+      "role": "accent",
+      "placement": "top-right"
+    },
+    {
+      "id": "vn-corner",
+      "role": "corner",
+      "placement": "top-left"
+    },
+    {
+      "id": "vn-rule",
+      "role": "rule",
+      "placement": "center"
+    }
+  ],
+  "elements": [
+    {
+      "src": "elements/poster.jpg",
+      "alt": "See America WPA poster (c.1938)",
+      "license": "PD-US-WPA"
+    }
+  ],
+  "treatments": {
+    "cover": {
+      "motifs": [
+        "vn-corner",
+        "vn-sunburst"
+      ]
+    },
+    "divider": {
+      "background": "grand-canyon",
+      "motifs": [
+        "vn-rule"
+      ]
+    }
+  }
+}

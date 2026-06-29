@@ -1,0 +1,5 @@
+[
+  {"url":"https://upload.wikimedia.org/wikipedia/commons/9/9f/See_America%2C_WPA_poster%2C_ca._1938.jpg","out":"elements/poster.jpg","license":"PD-US-WPA","credit":"See America, WPA Federal Art Project poster (c.1938), Wikimedia","role":"cover-art"},
+  {"url":"https://upload.wikimedia.org/wikipedia/commons/3/3e/Grand_Canyon_poster_1938.jpg","out":"backgrounds/grand-canyon.jpg","license":"PD-US-NPS","credit":"Grand Canyon NPS poster (1938), Wikimedia","role":"divider"},
+  {"url":"https://upload.wikimedia.org/wikipedia/commons/9/9a/Winter_in_New_York_State%2C_WPA_poster%2C_ca._1938.jpg","out":"backgrounds/winter.jpg","license":"PD-US-WPA","credit":"Winter in New York State, WPA poster (c.1938) by Jack Rivolta, Wikimedia","role":"divider"}
+]

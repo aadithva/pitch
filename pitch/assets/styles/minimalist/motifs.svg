@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<defs>
+  <symbol id="mn-rule" viewBox="0 0 100 8"><rect x="0" y="3" width="48" height="2" fill="currentColor"/></symbol>
+  <symbol id="mn-dot" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="currentColor"/></symbol>
+  <symbol id="mn-bracket" viewBox="0 0 40 100"><path d="M30 4 H10 V96 H30" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="mn-grid" viewBox="0 0 60 60"><g stroke="currentColor" stroke-width="1" opacity="0.5"><line x1="0" y1="20" x2="60" y2="20"/><line x1="0" y1="40" x2="60" y2="40"/><line x1="20" y1="0" x2="20" y2="60"/><line x1="40" y1="0" x2="40" y2="60"/></g></symbol>
+</defs>
+</svg>

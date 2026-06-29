@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<defs>
+<pattern id="pa-halftone" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="4.2" fill="currentColor"/></pattern>
+  <symbol id="pa-burst" viewBox="0 0 100 100"><g fill="currentColor"><polygon points="50,1 57.34,17.83 71.26,5.85 70.58,24.2 88.31,19.45 79.73,35.68 97.77,39.1 83,50 97.77,60.9 79.73,64.32 88.31,80.55 70.58,75.8 71.26,94.15 57.34,82.17 50,99 42.66,82.17 28.74,94.15 29.42,75.8 11.69,80.55 20.27,64.32 2.23,60.9 17,50 2.23,39.1 20.27,35.68 11.69,19.45 29.42,24.2 28.74,5.85 42.66,17.83"/></g></symbol>
+  <symbol id="pa-speech" viewBox="0 0 100 80"><g fill="none" stroke="currentColor" stroke-width="4"><path d="M8 8 H92 V54 H40 L22 72 V54 H8 Z" stroke-linejoin="round"/></g></symbol>
+  <symbol id="pa-frame" viewBox="0 0 100 100"><rect x="4" y="4" width="92" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="6"/></symbol>
+</defs>
+</svg>

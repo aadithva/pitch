@@ -1,0 +1,79 @@
+{
+  "id": "pop-art",
+  "name": "Pop Art",
+  "mode": "light",
+  "tagline": "Ben-day dots, bold blocks, comic bursts and speech bubbles.",
+  "recommendWhen": "Launches, campaigns, Gen-Z brands — loud, confident, fun.",
+  "palette": {
+    "background": "#FAFAF5",
+    "surface": "#FFF200",
+    "text": "#231F20",
+    "muted": "#5A5658",
+    "primary": "#ED1C24",
+    "secondary": "#0033A0",
+    "accent": "#EC008C",
+    "highlight": "#FFF200"
+  },
+  "fonts": {
+    "heading": "'Bangers', Impact, sans-serif",
+    "body": "'Barlow Semi Condensed', system-ui, sans-serif",
+    "mono": "'Space Mono', ui-monospace, monospace"
+  },
+  "fontWeights": {
+    "heading": 400,
+    "body": 500
+  },
+  "googleFonts": [
+    "Bangers",
+    "Barlow+Semi+Condensed:wght@400;600",
+    "Space+Mono"
+  ],
+  "backgrounds": [
+    {
+      "id": "benday",
+      "kind": "pattern",
+      "opacity": 1,
+      "use": [
+        "divider"
+      ]
+    },
+    {
+      "id": "halftone",
+      "kind": "image",
+      "src": "backgrounds/halftone.png",
+      "opacity": 0.5,
+      "use": [
+        "content"
+      ]
+    }
+  ],
+  "motifs": [
+    {
+      "id": "pa-burst",
+      "role": "burst",
+      "placement": "top-right"
+    },
+    {
+      "id": "pa-speech",
+      "role": "accent",
+      "placement": "bottom-left"
+    }
+  ],
+  "elements": [
+    {
+      "src": "elements/wpa-poster.jpg",
+      "alt": "WPA Federal Theatre poster",
+      "license": "PD/CC0"
+    }
+  ],
+  "treatments": {
+    "cover": {
+      "motifs": [
+        "pa-burst"
+      ]
+    },
+    "divider": {
+      "background": "benday"
+    }
+  }
+}

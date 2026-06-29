@@ -19,6 +19,7 @@ import { readFile, writeFile, mkdir, readdir, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, resolve, extname, basename, relative } from 'node:path';
 import { parseArgs } from 'node:util';
+import { parse, formatHex, oklch, wcagContrast } from 'culori';
 import { loadDefaultTheme, mergeTheme, compileThemeCss } from './lib/theme.mjs';
 
 const IGNORE_DIRS = new Set([
@@ -93,13 +94,22 @@ function mixHex(a, b, t) {
 function parseColor(value) {
   if (!value) return null;
   const v = value.trim().toLowerCase();
+  // Skip keywords culori would coerce into a real color (e.g. transparent -> #000).
+  if (/^(transparent|currentcolor|inherit|initial|unset|none|auto)$/.test(v)) return null;
   const hex = normalizeHex(v);
   if (hex) return hex;
-  const rgb = v.match(/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
-  if (rgb) return rgbToHex(+rgb[1], +rgb[2], +rgb[3]);
-  // HSL — wrapped `hsl(187 94% 43%)` or bare shadcn `187 94% 43%`
-  const hsl = v.match(/^(?:hsla?\(\s*)?(\d+(?:\.\d+)?)\s*[, ]\s*(\d+(?:\.\d+)?)%\s*[, ]\s*(\d+(?:\.\d+)?)%/);
-  if (hsl) return hslToHex(+hsl[1], +hsl[2], +hsl[3]);
+  // Bare shadcn HSL triplet: "187 94% 43%" or "187, 94%, 43%".
+  const bare = v.match(/^(\d+(?:\.\d+)?)\s*[, ]\s*(\d+(?:\.\d+)?)%\s*[, ]\s*(\d+(?:\.\d+)?)%$/);
+  if (bare) return hslToHex(+bare[1], +bare[2], +bare[3]);
+  // Everything else (rgb/hsl/oklch/oklab/lab/lch/color()/named) via culori — this
+  // is what lets modern projects (Tailwind v4, new shadcn) keep their brand colors.
+  try {
+    const c = parse(v);
+    if (c) {
+      const h = formatHex(c);
+      if (h) return normalizeHex(h) || h;
+    }
+  } catch { /* not a parseable color */ }
   return null;
 }
 
@@ -112,19 +122,16 @@ function luminance(hex) {
   return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
 }
 
-/** HSL saturation (0..1) — used to find a brand color with real "pop". */
-function saturation(hex) {
+/** Perceptual chroma (OKLCH C, ~0..0.4) — finds a brand color with real "pop".
+ *  More accurate than HSL saturation, matching color-thief v3's OKLCH scoring. */
+function chroma(hex) {
   if (!hex) return 0;
-  const n = hex.replace('#', '');
-  if (n.length < 6) return 0;
-  const r = parseInt(n.slice(0, 2), 16) / 255;
-  const g = parseInt(n.slice(2, 4), 16) / 255;
-  const b = parseInt(n.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return 0;
-  const d = max - min;
-  return l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  try {
+    const c = oklch(hex);
+    return c && Number.isFinite(c.c) ? c.c : 0;
+  } catch {
+    return 0;
+  }
 }
 
 // ---- signal extractors ------------------------------------------------------
@@ -316,15 +323,15 @@ function resolveTheme(base, signals, mode) {
 
   // The accent should "pop". If the chosen accent is desaturated (e.g. white/
   // gray on a monochrome brand), swap in the most saturated brand candidate.
-  if (saturation(colors.accent) < 0.25) {
+  if (chroma(colors.accent) < 0.06) {
     const candidates = [
       pick(named, /(^|[-_])(accent|tertiary|highlight|brand|primary|secondary)([-_]|$)/),
       brandSecondary, brandPrimary,
       vibrant && vibrant.vibrant, vibrant && vibrant.lightVibrant, vibrant && vibrant.darkVibrant
     ].filter(Boolean);
-    let best = colors.accent, bestSat = saturation(colors.accent);
+    let best = colors.accent, bestSat = chroma(colors.accent);
     for (const c of candidates) {
-      const s = saturation(c);
+      const s = chroma(c);
       if (s > bestSat) { bestSat = s; best = c; }
     }
     colors.accent = best;
@@ -346,6 +353,17 @@ function resolveTheme(base, signals, mode) {
       ? brandSurface : mixHex(brandBg, '#ffffff', 0.08);
     if (brandText && luminance(brandText) > 0.6) colors.text = brandText;
     if (brandMuted && luminance(brandMuted) > 0.25 && luminance(brandMuted) < 0.8) colors.muted = brandMuted;
+  }
+
+  // Legibility guard: guarantee body/muted text stay readable against the chosen
+  // background (WCAG AA ~4.5:1 for body, ~3:1 for muted). Prevents an adopted brand
+  // foreground from going unreadable on our base surface.
+  if (wcagContrast(colors.text, colors.background) < 4.5) {
+    colors.text = wcagContrast('#f8fafc', colors.background) >= wcagContrast('#0f172a', colors.background)
+      ? '#f8fafc' : '#0f172a';
+  }
+  if (colors.muted && wcagContrast(colors.muted, colors.background) < 3) {
+    colors.muted = mixHex(colors.text, colors.background, 0.4);
   }
 
   // Fonts

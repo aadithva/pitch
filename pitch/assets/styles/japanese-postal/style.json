@@ -1,0 +1,86 @@
+{
+  "id": "japanese-postal",
+  "name": "Japanese Postal",
+  "mode": "light",
+  "tagline": "Washi paper, ukiyo-e, postmarks and vermilion seals.",
+  "recommendWhen": "Heritage, craft, luxury, tea/sake, travel, stationery, or cultural narratives.",
+  "palette": {
+    "background": "#F4EFE1",
+    "surface": "#EAE2D0",
+    "text": "#1C1C1C",
+    "muted": "#6B6457",
+    "primary": "#1B2A6B",
+    "secondary": "#4A6B52",
+    "accent": "#BF3022",
+    "highlight": "#C49A28"
+  },
+  "fonts": {
+    "heading": "'Cormorant Garamond', Georgia, serif",
+    "body": "'Noto Sans', system-ui, sans-serif",
+    "mono": "'Space Mono', ui-monospace, monospace"
+  },
+  "fontWeights": {
+    "heading": 600,
+    "body": 400
+  },
+  "googleFonts": [
+    "Cormorant+Garamond:wght@500;600",
+    "Noto+Sans:wght@400;500",
+    "Space+Mono"
+  ],
+  "backgrounds": [
+    {
+      "id": "seigaiha",
+      "kind": "pattern",
+      "opacity": 0.16,
+      "use": [
+        "content",
+        "divider"
+      ]
+    },
+    {
+      "id": "red-fuji",
+      "kind": "image",
+      "src": "backgrounds/red-fuji.jpg",
+      "opacity": 0.9,
+      "use": [
+        "divider"
+      ]
+    }
+  ],
+  "motifs": [
+    {
+      "id": "jp-postmark",
+      "role": "stamp",
+      "placement": "top-right"
+    },
+    {
+      "id": "jp-seal",
+      "role": "accent",
+      "placement": "bottom-right"
+    }
+  ],
+  "elements": [
+    {
+      "src": "elements/great-wave.jpg",
+      "alt": "Hokusai Great Wave",
+      "license": "CC0"
+    },
+    {
+      "src": "elements/stamp.jpg",
+      "alt": "1871 Japanese stamp",
+      "license": "PD"
+    }
+  ],
+  "treatments": {
+    "cover": {
+      "background": "great-wave",
+      "motifs": [
+        "jp-postmark"
+      ]
+    },
+    "divider": {
+      "background": "red-fuji"
+    }
+  }
+}

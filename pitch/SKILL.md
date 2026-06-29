@@ -152,7 +152,7 @@ brand accent (and reserves a bottom safe-zone so it never covers slide content).
 ## Dependencies
 Install inside the skill folder:
 ```bash
-npm install                      # reveal.js, node-vibrant, playwright
+npm install                      # reveal.js, node-vibrant, culori, playwright
 npx playwright install chromium  # for PDF/PNG export and video capture
 
 # TTS (voiceover) — use a venv (PEP 668-safe):

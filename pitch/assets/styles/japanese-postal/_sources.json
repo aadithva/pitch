@@ -1,0 +1,6 @@
+[
+  {"url":"https://images.metmuseum.org/CRDImages/as/original/DP141063.jpg","out":"elements/great-wave.jpg","license":"CC0 1.0","credit":"Hokusai, Great Wave off Kanagawa, The Met Open Access","role":"cover-art"},
+  {"url":"https://images.metmuseum.org/CRDImages/as/original/DP141062.jpg","out":"backgrounds/red-fuji.jpg","license":"CC0 1.0","credit":"Hokusai, Red Fuji, The Met Open Access","role":"divider"},
+  {"url":"https://upload.wikimedia.org/wikipedia/commons/f/f9/100_views_edo_027.jpg","out":"backgrounds/plum.jpg","license":"PD-old-100","credit":"Hiroshige, Plum Garden Kamata, Wikimedia","role":"divider"},
+  {"url":"https://upload.wikimedia.org/wikipedia/commons/9/94/Ryu_Stamp_48mon.JPG","out":"elements/stamp.jpg","license":"PD (1871)","credit":"Japan's first postage stamp (1871), Wikimedia","role":"accent"}
+]
